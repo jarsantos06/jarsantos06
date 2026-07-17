@@ -18,6 +18,7 @@ export type Permission =
   // Módulo Almoxarifado
   | "almoxarifado.ver"
   | "almoxarifado.movimentar"
+  | "almoxarifado.gerenciar" // cadastrar/editar materiais
   | "almoxarifado.auditar"
   // Módulo Carreta
   | "carreta.ver"
@@ -41,6 +42,7 @@ const PERMISSOES: Record<Permission, Role[]> = {
   // Almoxarifado — movimentam: Controlador, Encarregado, Supervisor; auditoria: só Supervisor
   "almoxarifado.ver": ["CONTROLADOR", "ENCARREGADO", "SUPERVISOR", "GERENTE"],
   "almoxarifado.movimentar": ["CONTROLADOR", "ENCARREGADO", "SUPERVISOR"],
+  "almoxarifado.gerenciar": ["SUPERVISOR"],
   "almoxarifado.auditar": ["SUPERVISOR"],
 
   // Carreta — travam/destravam: Controlador e Encarregado
