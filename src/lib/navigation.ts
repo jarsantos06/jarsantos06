@@ -36,4 +36,12 @@ export const MODULOS: ModuloNav[] = [
     emoji: "📝",
     permissao: "ocorrencia.criar",
   },
+  {
+    chave: "escala",
+    titulo: "Escala / Turnos",
+    descricao: "Escalas de trabalho por padrão (2x2, 6x1, 5x2) e turno",
+    href: "/painel/escala",
+    emoji: "📅",
+    permissao: "escala.ver",
+  },
 ];

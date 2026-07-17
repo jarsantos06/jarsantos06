@@ -26,6 +26,9 @@ export type Permission =
   // Módulo Ocorrências
   | "ocorrencia.criar"
   | "ocorrencia.aprovar"
+  // Módulo Escala
+  | "escala.ver"
+  | "escala.gerenciar"
   // Administração
   | "admin.usuarios";
 
@@ -52,6 +55,10 @@ const PERMISSOES: Record<Permission, Role[]> = {
   // Ocorrências — solicita: todos; aprova: Supervisor e Gerente
   "ocorrencia.criar": TODOS,
   "ocorrencia.aprovar": ["SUPERVISOR", "GERENTE"],
+
+  // Escala — todos veem a própria; monta/edita: Supervisor e Gerente
+  "escala.ver": TODOS,
+  "escala.gerenciar": ["SUPERVISOR", "GERENTE"],
 
   // Administração de usuários — só Gerente
   "admin.usuarios": ["GERENTE"],
