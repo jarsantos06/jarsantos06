@@ -21,6 +21,11 @@ Portal de gestão operacional modular (logística/pátio) com controle de acesso
 | **📦 Almoxarifado** | Entrada/saída de materiais (uso diário e limpeza), com bloqueio de saldo negativo | Controlador, Encarregado, Supervisor | Auditoria: só Supervisor. Cadastro de material: só Supervisor |
 | **🚛 Travamento de Carreta** | Trava/destrava carretas no pátio com placa, foto, ticket e data/hora automáticos | Controlador, Encarregado | — |
 | **📝 Ocorrências** | Ficha de falta/atraso com evidência e fluxo de aprovação | Todos os funcionários criam | Aprovam: Supervisor e Gerente |
+| **📅 Escala / Turnos** | Escalas por padrão (2x2, 6x1, 5x2) e turno; cálculo automático de trabalha/folga a partir da data de início (padronizável) | Funcionário vê só a própria | Monta/edita: Supervisor e Gerente |
+
+### Como funciona a Escala
+
+A escala **não guarda dia a dia**. Ela guarda o **padrão** (ex.: 2x2) e a **data de início** (âncora do ciclo). A partir daí o sistema calcula se o funcionário trabalha ou folga em qualquer data — então a escala "se repete sozinha" (padronizada) até uma nova atribuição substituí-la. Quando um funcionário muda de escala/turno, o gestor cria uma nova atribuição com a data da mudança; a mais recente vigente prevalece. Lógica pura e testável em `src/lib/escala.ts`.
 
 ## Como rodar (desenvolvimento)
 

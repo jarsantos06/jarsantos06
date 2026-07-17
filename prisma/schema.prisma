@@ -40,6 +40,8 @@ model User {
   destravamentos Travamento[]          @relation("DestravamentoOperador")
   ocorrencias   Ocorrencia[]           @relation("OcorrenciaSolicitante")
   aprovacoes    Ocorrencia[]           @relation("OcorrenciaAprovador")
+  escalas       EscalaFuncionario[]    @relation("EscalaFuncionario")
+  escalasCriadas EscalaFuncionario[]   @relation("EscalaCriador")
 
   @@index([role])
 }
@@ -157,4 +159,56 @@ model Ocorrencia {
   @@index([status])
   @@index([solicitanteId])
   @@index([createdAt])
+}
+
+// ===========================================================================
+// MÓDULO 4 — ESCALA / TURNOS
+// ===========================================================================
+
+// Padrão de escala: ciclo de dias trabalhados x folgados (ex.: 2x2, 6x1, 5x2)
+model PadraoEscala {
+  id           String              @id @default(cuid())
+  nome         String              @unique // "2x2", "6x1", "5x2"
+  diasTrabalho Int
+  diasFolga    Int
+  ativo        Boolean             @default(true)
+  createdAt    DateTime            @default(now())
+
+  escalas      EscalaFuncionario[]
+}
+
+// Turno: faixa de horário (ex.: Diurno 07:00-19:00, Noturno 19:00-07:00)
+model Turno {
+  id         String              @id @default(cuid())
+  nome       String              @unique
+  horaInicio String // "07:00"
+  horaFim    String // "19:00"
+  ativo      Boolean             @default(true)
+  createdAt  DateTime            @default(now())
+
+  escalas    EscalaFuncionario[]
+}
+
+// Atribuição de escala a um funcionário.
+// dataInicio é a ÂNCORA do ciclo: o sistema calcula trabalha/folga a partir dela.
+// dataFim nulo = escala padronizada (segue repetindo até uma nova substituí-la).
+model EscalaFuncionario {
+  id            String       @id @default(cuid())
+  funcionario   User         @relation("EscalaFuncionario", fields: [funcionarioId], references: [id])
+  funcionarioId String
+  padrao        PadraoEscala @relation(fields: [padraoId], references: [id])
+  padraoId      String
+  turno         Turno        @relation(fields: [turnoId], references: [id])
+  turnoId       String
+  dataInicio    DateTime // âncora do ciclo
+  dataFim       DateTime? // nulo = vigente/padronizada
+  observacao    String?
+
+  criadoPor     User         @relation("EscalaCriador", fields: [criadoPorId], references: [id])
+  criadoPorId   String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([funcionarioId])
+  @@index([dataInicio])
 }
