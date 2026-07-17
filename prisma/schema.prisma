@@ -1,0 +1,160 @@
+// Sistema Operacional — schema base
+// Banco: SQLite em dev (sem infra). Migração para PostgreSQL é direta:
+// basta trocar provider = "postgresql" e a DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Papéis de acesso (RBAC)
+// FUNCIONARIO < CONTROLADOR < ENCARREGADO < SUPERVISOR < GERENTE
+// ---------------------------------------------------------------------------
+enum Role {
+  FUNCIONARIO
+  CONTROLADOR
+  ENCARREGADO
+  SUPERVISOR
+  GERENTE
+}
+
+model User {
+  id        String   @id @default(cuid())
+  matricula String   @unique // login (matrícula do funcionário)
+  nome      String
+  email     String?  @unique
+  senhaHash String
+  role      Role     @default(FUNCIONARIO)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações abertas conforme os módulos forem construídos
+  movimentacoes MovimentacaoMaterial[] @relation("MovimentacaoUsuario")
+  travamentos   Travamento[]           @relation("TravamentoOperador")
+  destravamentos Travamento[]          @relation("DestravamentoOperador")
+  ocorrencias   Ocorrencia[]           @relation("OcorrenciaSolicitante")
+  aprovacoes    Ocorrencia[]           @relation("OcorrenciaAprovador")
+
+  @@index([role])
+}
+
+// ===========================================================================
+// MÓDULO 1 — ALMOXARIFADO
+// ===========================================================================
+enum CategoriaMaterial {
+  USO_DIARIO
+  LIMPEZA
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+}
+
+model Material {
+  id            String            @id @default(cuid())
+  codigo        String            @unique
+  nome          String
+  categoria     CategoriaMaterial
+  unidade       String            @default("UN") // UN, CX, L, KG...
+  saldo         Int               @default(0)
+  estoqueMinimo Int               @default(0)
+  ativo         Boolean           @default(true)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  movimentacoes MovimentacaoMaterial[]
+
+  @@index([categoria])
+}
+
+model MovimentacaoMaterial {
+  id         String           @id @default(cuid())
+  material   Material         @relation(fields: [materialId], references: [id])
+  materialId String
+  tipo       TipoMovimentacao
+  quantidade Int
+  saldoApos  Int // saldo do material após a movimentação (trilha de auditoria)
+  destino    String? // para quem/onde saiu, ou fornecedor na entrada
+  observacao String?
+  usuario    User             @relation("MovimentacaoUsuario", fields: [usuarioId], references: [id])
+  usuarioId  String
+  createdAt  DateTime         @default(now())
+
+  @@index([materialId])
+  @@index([tipo])
+  @@index([createdAt])
+}
+
+// ===========================================================================
+// MÓDULO 2 — TRAVAMENTO DE CARRETA
+// ===========================================================================
+enum StatusCarreta {
+  TRAVADA
+  DESTRAVADA
+}
+
+model Travamento {
+  id             String        @id @default(cuid())
+  placa          String
+  ticket         String        @unique
+  fotoUrl        String // foto da carreta travada
+  status         StatusCarreta @default(TRAVADA)
+  observacao     String?
+
+  operador       User          @relation("TravamentoOperador", fields: [operadorId], references: [id])
+  operadorId     String
+  travadoEm      DateTime      @default(now())
+
+  destravador    User?         @relation("DestravamentoOperador", fields: [destravadorId], references: [id])
+  destravadorId  String?
+  destravadoEm   DateTime?
+
+  @@index([status])
+  @@index([placa])
+  @@index([travadoEm])
+}
+
+// ===========================================================================
+// MÓDULO 3 — OCORRÊNCIAS (FALTAS E ATRASOS)
+// ===========================================================================
+enum TipoOcorrencia {
+  FALTA
+  ATRASO
+}
+
+enum StatusOcorrencia {
+  PENDENTE
+  APROVADA
+  REPROVADA
+}
+
+model Ocorrencia {
+  id            String           @id @default(cuid())
+  tipo          TipoOcorrencia
+  dataOcorrencia DateTime
+  motivo        String
+  evidenciaUrl  String? // anexo de evidência
+  status        StatusOcorrencia @default(PENDENTE)
+
+  solicitante   User             @relation("OcorrenciaSolicitante", fields: [solicitanteId], references: [id])
+  solicitanteId String
+
+  aprovador     User?            @relation("OcorrenciaAprovador", fields: [aprovadorId], references: [id])
+  aprovadorId   String?
+  parecer       String? // observação do gestor na aprovação/reprovação
+  decididoEm    DateTime?
+
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([status])
+  @@index([solicitanteId])
+  @@index([createdAt])
+}

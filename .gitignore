@@ -1,0 +1,29 @@
+# dependências
+/node_modules
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# produção
+/build
+
+# ambiente
+.env
+.env*.local
+
+# banco de dados (SQLite dev)
+*.db
+*.db-journal
+/prisma/dev.db*
+
+# uploads locais (foto de carreta, evidências)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# logs e sistema
+npm-debug.log*
+.DS_Store
+*.pem
+/coverage
