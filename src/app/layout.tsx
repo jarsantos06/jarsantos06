@@ -3,7 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Sistema Operacional",
-  description: "Portal de gestão operacional — almoxarifado, pátio e ocorrências",
+  description:
+    "Portal de gestão operacional — almoxarifado, pátio e ocorrências",
 };
 
 export default function RootLayout({

@@ -22,7 +22,9 @@ export function NovaOcorrenciaForm({ nomeUsuario }: { nomeUsuario: string }) {
       className="space-y-4"
     >
       <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">Funcionário</span>
+        <span className="mb-1 block font-medium text-slate-700">
+          Funcionário
+        </span>
         <input
           value={nomeUsuario}
           disabled

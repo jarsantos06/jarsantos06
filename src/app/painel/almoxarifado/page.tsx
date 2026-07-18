@@ -22,10 +22,15 @@ export default async function AlmoxarifadoPage() {
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link href="/painel" className="text-sm text-brand-600 hover:underline">
+          <Link
+            href="/painel"
+            className="text-sm text-brand-600 hover:underline"
+          >
             ← Painel
           </Link>
-          <h1 className="text-2xl font-semibold text-slate-800">📦 Almoxarifado</h1>
+          <h1 className="text-2xl font-semibold text-slate-800">
+            📦 Almoxarifado
+          </h1>
           <p className="text-slate-500">Materiais de uso diário e limpeza</p>
         </div>
         <div className="flex gap-2">
@@ -102,7 +107,10 @@ export default async function AlmoxarifadoPage() {
             })}
             {materiais.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                <td
+                  colSpan={5}
+                  className="px-4 py-8 text-center text-slate-400"
+                >
                   Nenhum material cadastrado ainda.
                 </td>
               </tr>

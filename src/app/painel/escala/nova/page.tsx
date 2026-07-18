@@ -14,7 +14,10 @@ export default async function NovaEscalaPage({
 
   const [usuarios, padroes, turnos] = await Promise.all([
     db.user.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    db.padraoEscala.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    db.padraoEscala.findMany({
+      where: { ativo: true },
+      orderBy: { nome: "asc" },
+    }),
     db.turno.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
   ]);
 
@@ -26,7 +29,7 @@ export default async function NovaEscalaPage({
       >
         ← Equipe
       </Link>
-      <h1 className="mt-2 mb-6 text-2xl font-semibold text-slate-800">
+      <h1 className="mb-6 mt-2 text-2xl font-semibold text-slate-800">
         Nova escala
       </h1>
       <div className="rounded-2xl border border-slate-200 bg-white p-6">

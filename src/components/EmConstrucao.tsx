@@ -9,10 +9,7 @@ export function EmConstrucao({
 }) {
   return (
     <div className="mx-auto max-w-2xl">
-      <Link
-        href="/painel"
-        className="text-sm text-brand-600 hover:underline"
-      >
+      <Link href="/painel" className="text-sm text-brand-600 hover:underline">
         ← Voltar ao painel
       </Link>
       <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">

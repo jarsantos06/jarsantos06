@@ -71,9 +71,7 @@ export function can(role: Role, permission: Permission): boolean {
 
 /** Lista as permissões de um papel (útil para montar a navegação). */
 export function permissionsOf(role: Role): Permission[] {
-  return (Object.keys(PERMISSOES) as Permission[]).filter((p) =>
-    can(role, p),
-  );
+  return (Object.keys(PERMISSOES) as Permission[]).filter((p) => can(role, p));
 }
 
 export function roleLabel(role: Role): string {

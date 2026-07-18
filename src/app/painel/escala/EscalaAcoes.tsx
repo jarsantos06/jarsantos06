@@ -61,9 +61,7 @@ export function EscalaAcoes({
       </form>
 
       {(encState.erro || delState.erro) && (
-        <p className="text-xs text-red-600">
-          {encState.erro ?? delState.erro}
-        </p>
+        <p className="text-xs text-red-600">{encState.erro ?? delState.erro}</p>
       )}
       {(encState.ok || delState.ok) && (
         <p className="text-xs text-green-700">{encState.ok ?? delState.ok}</p>

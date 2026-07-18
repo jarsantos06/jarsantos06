@@ -26,7 +26,7 @@ export default async function AuditoriaPage() {
       >
         ← Almoxarifado
       </Link>
-      <h1 className="mt-2 mb-1 text-2xl font-semibold text-slate-800">
+      <h1 className="mb-1 mt-2 text-2xl font-semibold text-slate-800">
         📊 Auditoria de movimentações
       </h1>
       <p className="mb-6 text-slate-500">
@@ -86,12 +86,17 @@ export default async function AuditoriaPage() {
                   {mv.saldoApos}
                 </td>
                 <td className="px-4 py-3 text-slate-600">{mv.usuario.nome}</td>
-                <td className="px-4 py-3 text-slate-500">{mv.destino ?? "—"}</td>
+                <td className="px-4 py-3 text-slate-500">
+                  {mv.destino ?? "—"}
+                </td>
               </tr>
             ))}
             {movimentacoes.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
+                <td
+                  colSpan={7}
+                  className="px-4 py-8 text-center text-slate-400"
+                >
                   Nenhuma movimentação registrada ainda.
                 </td>
               </tr>

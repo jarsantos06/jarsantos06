@@ -16,10 +16,13 @@ export default async function HistoricoCarretaPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <Link href="/painel/carreta" className="text-sm text-brand-600 hover:underline">
+      <Link
+        href="/painel/carreta"
+        className="text-sm text-brand-600 hover:underline"
+      >
         ← Travamento de Carreta
       </Link>
-      <h1 className="mt-2 mb-6 text-2xl font-semibold text-slate-800">
+      <h1 className="mb-6 mt-2 text-2xl font-semibold text-slate-800">
         🕑 Histórico de carretas
       </h1>
 
@@ -85,7 +88,10 @@ export default async function HistoricoCarretaPage() {
             ))}
             {registros.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
+                <td
+                  colSpan={6}
+                  className="px-4 py-8 text-center text-slate-400"
+                >
                   Nenhum registro de travamento.
                 </td>
               </tr>

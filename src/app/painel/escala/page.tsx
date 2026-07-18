@@ -22,7 +22,10 @@ export default async function EscalaPage({
     <div className="mx-auto max-w-3xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link href="/painel" className="text-sm text-brand-600 hover:underline">
+          <Link
+            href="/painel"
+            className="text-sm text-brand-600 hover:underline"
+          >
             ← Painel
           </Link>
           <h1 className="text-2xl font-semibold text-slate-800">

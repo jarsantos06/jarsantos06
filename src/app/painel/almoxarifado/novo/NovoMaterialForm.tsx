@@ -45,7 +45,9 @@ export function NovoMaterialForm() {
 
       <div className="grid grid-cols-2 gap-3">
         <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">Categoria</span>
+          <span className="mb-1 block font-medium text-slate-700">
+            Categoria
+          </span>
           <select
             name="categoria"
             defaultValue="USO_DIARIO"

@@ -27,7 +27,9 @@ export function NovaEscalaForm({
   return (
     <form action={formAction} className="space-y-4">
       <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">Funcionário</span>
+        <span className="mb-1 block font-medium text-slate-700">
+          Funcionário
+        </span>
         <select
           name="funcionarioId"
           defaultValue={funcionarioIdInicial ?? ""}
@@ -104,8 +106,8 @@ export function NovaEscalaForm({
         </label>
       </div>
       <p className="-mt-2 text-xs text-slate-400">
-        Deixe o fim em branco para a escala ser <strong>padronizada</strong> (repete
-        o ciclo automaticamente até uma nova escala substituí-la).
+        Deixe o fim em branco para a escala ser <strong>padronizada</strong>{" "}
+        (repete o ciclo automaticamente até uma nova escala substituí-la).
       </p>
 
       <label className="block text-sm">

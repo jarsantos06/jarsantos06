@@ -19,7 +19,10 @@ export default async function CarretaPage() {
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link href="/painel" className="text-sm text-brand-600 hover:underline">
+          <Link
+            href="/painel"
+            className="text-sm text-brand-600 hover:underline"
+          >
             ← Painel
           </Link>
           <h1 className="text-2xl font-semibold text-slate-800">
@@ -80,7 +83,9 @@ export default async function CarretaPage() {
                     </div>
                     <dl className="mt-3 space-y-1 text-xs text-slate-500">
                       <div>
-                        <span className="font-medium text-slate-600">Ticket:</span>{" "}
+                        <span className="font-medium text-slate-600">
+                          Ticket:
+                        </span>{" "}
                         {t.ticket}
                       </div>
                       <div>
@@ -95,7 +100,9 @@ export default async function CarretaPage() {
                       </div>
                       {t.observacao && (
                         <div>
-                          <span className="font-medium text-slate-600">Obs.:</span>{" "}
+                          <span className="font-medium text-slate-600">
+                            Obs.:
+                          </span>{" "}
                           {t.observacao}
                         </div>
                       )}

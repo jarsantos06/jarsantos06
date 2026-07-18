@@ -39,7 +39,10 @@ export default async function GerenciarEscalaPage() {
   const padraoAtualNome = new Map<string, string>();
   for (const e of escalas) {
     // guardamos o nome do padrão associado à atribuição vigente mais recente
-    const atual = atribuicaoDoDia(porFuncionario.get(e.funcionarioId) ?? [], hoje);
+    const atual = atribuicaoDoDia(
+      porFuncionario.get(e.funcionarioId) ?? [],
+      hoje,
+    );
     if (
       atual &&
       atual.dataInicio.getTime() === e.dataInicio.getTime() &&
@@ -53,7 +56,10 @@ export default async function GerenciarEscalaPage() {
     <div className="mx-auto max-w-4xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link href="/painel/escala" className="text-sm text-brand-600 hover:underline">
+          <Link
+            href="/painel/escala"
+            className="text-sm text-brand-600 hover:underline"
+          >
             ← Minha escala
           </Link>
           <h1 className="text-2xl font-semibold text-slate-800">

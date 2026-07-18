@@ -38,8 +38,10 @@ export default async function MaterialPage({
         ← Almoxarifado
       </Link>
 
-      <div className="mt-2 mb-6">
-        <h1 className="text-2xl font-semibold text-slate-800">{material.nome}</h1>
+      <div className="mb-6 mt-2">
+        <h1 className="text-2xl font-semibold text-slate-800">
+          {material.nome}
+        </h1>
         <p className="font-mono text-sm text-slate-500">{material.codigo}</p>
       </div>
 

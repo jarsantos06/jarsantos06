@@ -19,7 +19,7 @@ export default async function ConfigEscalaPage() {
       >
         ← Equipe
       </Link>
-      <h1 className="mt-2 mb-6 text-2xl font-semibold text-slate-800">
+      <h1 className="mb-6 mt-2 text-2xl font-semibold text-slate-800">
         ⚙️ Turnos e padrões
       </h1>
 
