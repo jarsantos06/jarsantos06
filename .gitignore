@@ -5,6 +5,7 @@
 /.next/
 /out/
 next-env.d.ts
+*.tsbuildinfo
 
 # produção
 /build
@@ -18,9 +19,9 @@ next-env.d.ts
 *.db-journal
 /prisma/dev.db*
 
-# uploads locais (foto de carreta, evidências)
-/public/uploads/*
-!/public/uploads/.gitkeep
+# uploads locais (foto de carreta, evidências) — servidos por /midia, fora de public/
+/storage/uploads/*
+!/storage/uploads/.gitkeep
 
 # logs e sistema
 npm-debug.log*

@@ -2,11 +2,9 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import type { Role } from "@prisma/client";
+import { sessionSecret as secret } from "./secret";
 
 const COOKIE_NAME = "sessao";
-const secret = new TextEncoder().encode(
-  process.env.SESSION_SECRET ?? "dev-secret-inseguro",
-);
 
 export type SessionPayload = {
   userId: string;

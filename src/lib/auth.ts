@@ -1,13 +1,36 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { getSession, type SessionPayload } from "./session";
+import { db } from "./db";
+import { getSession, destroySession, type SessionPayload } from "./session";
 import { can, type Permission } from "./rbac";
 
-/** Retorna a sessão atual ou redireciona para o login. */
+/**
+ * Retorna o usuário atual (revalidado no banco) ou redireciona para o login.
+ *
+ * Revalidar contra o banco garante que uma conta desativada ou com papel
+ * alterado perca acesso imediatamente, em vez de continuar com os dados
+ * "congelados" no JWT por até 8h.
+ */
 export async function requireUser(): Promise<SessionPayload> {
   const session = await getSession();
   if (!session) redirect("/login");
-  return session;
+
+  const user = await db.user.findUnique({
+    where: { id: session.userId },
+    select: { id: true, matricula: true, nome: true, role: true, ativo: true },
+  });
+
+  if (!user || !user.ativo) {
+    await destroySession();
+    redirect("/login");
+  }
+
+  return {
+    userId: user.id,
+    matricula: user.matricula,
+    nome: user.nome,
+    role: user.role, // papel ATUAL do banco (não o do token)
+  };
 }
 
 /**

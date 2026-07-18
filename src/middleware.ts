@@ -1,9 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-
-const secret = new TextEncoder().encode(
-  process.env.SESSION_SECRET ?? "dev-secret-inseguro",
-);
+import { sessionSecret as secret } from "./lib/secret";
 
 // Rotas públicas (não exigem login)
 const PUBLICAS = ["/login"];
@@ -37,8 +34,8 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Protege tudo, exceto assets estáticos, a API de auth e uploads públicos
-  matcher: [
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|uploads).*)",
-  ],
+  // Protege tudo, exceto assets estáticos e a API de auth.
+  // /midia tem autenticação própria na route handler (não passa aqui para
+  // poder responder 401 a <img> em vez de redirecionar para HTML de login).
+  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|midia).*)"],
 };

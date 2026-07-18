@@ -7,6 +7,12 @@ import { createSession } from "@/lib/session";
 
 export type LoginState = { erro?: string };
 
+// Hash "isca" (não corresponde a nenhuma senha). Usado quando a matrícula não
+// existe, para que verifyPassword rode do mesmo jeito e o tempo de resposta
+// não denuncie se a matrícula é válida (evita enumeração por timing).
+const HASH_DUMMY =
+  "$2a$10$pvouiJN9WyA6eJ1Kqi5.9uA9uBS7Nu/YNhgYQGRWXLtq.ZQ6r495G";
+
 export async function loginAction(
   _prev: LoginState,
   formData: FormData,
@@ -19,13 +25,14 @@ export async function loginAction(
   }
 
   const user = await db.user.findUnique({ where: { matricula } });
-  if (!user || !user.ativo) {
-    return { erro: "Usuário não encontrado ou inativo." };
-  }
+  const senhaConfere = await verifyPassword(
+    senha,
+    user?.senhaHash ?? HASH_DUMMY,
+  );
 
-  const ok = await verifyPassword(senha, user.senhaHash);
-  if (!ok) {
-    return { erro: "Senha incorreta." };
+  // Mensagem genérica e única — não revela se a matrícula existe ou está inativa.
+  if (!user || !user.ativo || !senhaConfere) {
+    return { erro: "Matrícula ou senha inválidos." };
   }
 
   await createSession({
