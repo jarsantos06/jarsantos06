@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #f4f6fb;
+  --background: #f1f5f9;
   --foreground: #0f172a;
 }
 
@@ -11,9 +11,24 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+    system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Acessibilidade: anel de foco visível e consistente em toda a interação por teclado */
+@layer base {
+  *:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px theme("colors.brand.400");
+    border-radius: 4px;
+  }
+}
+
+/* Barras de rolagem discretas (desktop) */
+@media (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
 }

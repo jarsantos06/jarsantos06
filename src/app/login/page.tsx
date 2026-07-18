@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { loginAction, type LoginState } from "./actions";
+import { Field, Input, Button, Alert, Logo } from "@/components/ui";
 
 const inicial: LoginState = {};
 
@@ -9,58 +10,39 @@ export default function LoginPage() {
   const [state, formAction, pending] = useActionState(loginAction, inicial);
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
-        <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-lg font-bold text-white">
-            SO
-          </div>
-          <h1 className="text-xl font-semibold text-slate-800">
-            Sistema Operacional
-          </h1>
-          <p className="text-sm text-slate-500">Acesse com sua matrícula</p>
+    <main className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
+        <div className="mb-6 flex flex-col items-center text-center">
+          <Logo tone="onLight" size="lg" tagline />
+          <p className="mt-4 text-sm text-slate-500">
+            Acesse com sua matrícula
+          </p>
         </div>
 
         <form action={formAction} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Matrícula
-            </label>
-            <input
+          <Field label="Matrícula">
+            <Input
               name="matricula"
               type="text"
               autoComplete="username"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-800 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
               placeholder="Ex.: 1001"
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Senha
-            </label>
-            <input
+          <Field label="Senha">
+            <Input
               name="senha"
               type="password"
               autoComplete="current-password"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-800 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
               placeholder="••••••••"
             />
-          </div>
+          </Field>
 
-          {state.erro && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-              {state.erro}
-            </p>
-          )}
+          {state.erro && <Alert tone="danger">{state.erro}</Alert>}
 
-          <button
-            type="submit"
-            disabled={pending}
-            className="w-full rounded-lg bg-brand-600 py-2.5 font-medium text-white transition hover:bg-brand-700 disabled:opacity-60"
-          >
+          <Button type="submit" disabled={pending} className="w-full">
             {pending ? "Entrando..." : "Entrar"}
-          </button>
+          </Button>
         </form>
       </div>
     </main>

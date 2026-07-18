@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Sistema Operacional",
+  title: "VALENLOG — Logística e Triagem",
   description:
-    "Portal de gestão operacional — almoxarifado, pátio e ocorrências",
+    "Portal de gestão operacional — almoxarifado, pátio, ocorrências e escala",
 };
 
 export default function RootLayout({
