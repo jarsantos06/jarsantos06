@@ -9,10 +9,14 @@
 
 const MS_DIA = 86_400_000;
 
-/** Diferença em dias inteiros (ignora horário/fuso, usa data civil). */
+/**
+ * Diferença em dias inteiros entre duas datas civis.
+ * Usa getters UTC — as datas civis são ancoradas em UTC (ver lib/date.ts),
+ * então o cálculo fica imune ao fuso do servidor.
+ */
 function diasEntre(a: Date, b: Date): number {
-  const ua = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-  const ub = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  const ua = Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate());
+  const ub = Date.UTC(b.getUTCFullYear(), b.getUTCMonth(), b.getUTCDate());
   return Math.floor((ub - ua) / MS_DIA);
 }
 
@@ -67,7 +71,7 @@ export function atribuicaoDoDia(
 }
 
 export type DiaEscala = {
-  dia: Date;
+  numero: number; // dia do mês (1-31), já resolvido em UTC
   trabalha: boolean;
   turnoNome?: string;
   turnoInicio?: string;
@@ -80,14 +84,14 @@ export function montarMes(
   ano: number,
   mes: number, // 1-12
 ): DiaEscala[] {
-  const totalDias = new Date(ano, mes, 0).getDate(); // último dia do mês
+  const totalDias = new Date(Date.UTC(ano, mes, 0)).getUTCDate(); // último dia
   const resultado: DiaEscala[] = [];
 
   for (let d = 1; d <= totalDias; d++) {
-    const dia = new Date(ano, mes - 1, d);
+    const dia = new Date(Date.UTC(ano, mes - 1, d));
     const a = atribuicaoDoDia(atribuicoes, dia);
     if (!a) {
-      resultado.push({ dia, trabalha: false });
+      resultado.push({ numero: d, trabalha: false });
       continue;
     }
     const trabalha = trabalhaNoDia(
@@ -97,7 +101,7 @@ export function montarMes(
       dia,
     );
     resultado.push({
-      dia,
+      numero: d,
       trabalha,
       turnoNome: trabalha ? a.turnoNome : undefined,
       turnoInicio: trabalha ? a.turnoInicio : undefined,
@@ -107,7 +111,22 @@ export function montarMes(
   return resultado;
 }
 
+/** Dia da semana (0=Dom..6=Sáb) do 1º dia do mês, em UTC. */
+export function primeiroDiaSemanaDoMes(ano: number, mes: number): number {
+  return new Date(Date.UTC(ano, mes - 1, 1)).getUTCDay();
+}
+
 export const NOMES_MES = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
 ];

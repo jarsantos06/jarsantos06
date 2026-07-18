@@ -4,6 +4,7 @@ import { requirePermission } from "@/lib/auth";
 import { roleLabel } from "@/lib/rbac";
 import { db } from "@/lib/db";
 import { montarMes } from "@/lib/escala";
+import { formatCivil } from "@/lib/date";
 import { CalendarioEscala } from "../../CalendarioEscala";
 import { EscalaAcoes } from "../../EscalaAcoes";
 import { carregarAtribuicoes, resolverMes } from "../../data";
@@ -26,7 +27,11 @@ export default async function FuncionarioEscalaPage({
     carregarAtribuicoes(id),
     db.escalaFuncionario.findMany({
       where: { funcionarioId: id },
-      include: { padrao: true, turno: true, criadoPor: { select: { nome: true } } },
+      include: {
+        padrao: true,
+        turno: true,
+        criadoPor: { select: { nome: true } },
+      },
       orderBy: { dataInicio: "desc" },
     }),
   ]);
@@ -42,7 +47,7 @@ export default async function FuncionarioEscalaPage({
       >
         ← Equipe
       </Link>
-      <div className="mt-2 mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-6 mt-2 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-slate-800">
             {funcionario.nome}
@@ -95,13 +100,15 @@ export default async function FuncionarioEscalaPage({
                     )}
                   </div>
                   <p className="mt-1 text-xs text-slate-500">
-                    Início: {r.dataInicio.toLocaleDateString("pt-BR")}
+                    Início: {formatCivil(r.dataInicio)}
                     {r.dataFim
-                      ? ` · Fim: ${r.dataFim.toLocaleDateString("pt-BR")}`
+                      ? ` · Fim: ${formatCivil(r.dataFim)}`
                       : " · padronizada (sem fim)"}
                   </p>
                   {r.observacao && (
-                    <p className="mt-1 text-xs text-slate-400">{r.observacao}</p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {r.observacao}
+                    </p>
                   )}
                   <div className="mt-3">
                     <EscalaAcoes id={r.id} encerrada={encerrada} />

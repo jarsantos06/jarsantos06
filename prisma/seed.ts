@@ -24,10 +24,30 @@ async function main() {
 
   // Materiais iniciais do almoxarifado
   const materiais = [
-    { codigo: "MAT-001", nome: "Papel A4 (resma)", categoria: "USO_DIARIO", unidade: "RESMA" },
-    { codigo: "MAT-002", nome: "Caneta esferográfica azul", categoria: "USO_DIARIO", unidade: "UN" },
-    { codigo: "LMP-001", nome: "Detergente 5L", categoria: "LIMPEZA", unidade: "GL" },
-    { codigo: "LMP-002", nome: "Papel toalha (fardo)", categoria: "LIMPEZA", unidade: "FD" },
+    {
+      codigo: "MAT-001",
+      nome: "Papel A4 (resma)",
+      categoria: "USO_DIARIO",
+      unidade: "RESMA",
+    },
+    {
+      codigo: "MAT-002",
+      nome: "Caneta esferográfica azul",
+      categoria: "USO_DIARIO",
+      unidade: "UN",
+    },
+    {
+      codigo: "LMP-001",
+      nome: "Detergente 5L",
+      categoria: "LIMPEZA",
+      unidade: "GL",
+    },
+    {
+      codigo: "LMP-002",
+      nome: "Papel toalha (fardo)",
+      categoria: "LIMPEZA",
+      unidade: "FD",
+    },
   ] as const;
 
   for (const m of materiais) {
@@ -68,7 +88,9 @@ async function main() {
   // Escala de exemplo para a funcionária Ana (2x2 diurno, a partir de 01/07/2026)
   const ana = await db.user.findUnique({ where: { matricula: "1001" } });
   const gerente = await db.user.findUnique({ where: { matricula: "5001" } });
-  const padrao2x2 = await db.padraoEscala.findUnique({ where: { nome: "2x2" } });
+  const padrao2x2 = await db.padraoEscala.findUnique({
+    where: { nome: "2x2" },
+  });
   const diurno = await db.turno.findUnique({ where: { nome: "Diurno" } });
   if (ana && gerente && padrao2x2 && diurno) {
     const jaTem = await db.escalaFuncionario.findFirst({
@@ -80,7 +102,7 @@ async function main() {
           funcionarioId: ana.id,
           padraoId: padrao2x2.id,
           turnoId: diurno.id,
-          dataInicio: new Date(2026, 6, 1),
+          dataInicio: new Date(Date.UTC(2026, 6, 1)),
           dataFim: null,
           criadoPorId: gerente.id,
         },

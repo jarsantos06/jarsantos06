@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth";
+import { parseCivilDate } from "@/lib/date";
 
 export type ActionState = { erro?: string; ok?: string };
 
@@ -37,18 +39,28 @@ export async function criarEscalaAction(
     return { erro: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
 
-  const dataInicio = new Date(parsed.data.dataInicio);
-  if (Number.isNaN(dataInicio.getTime())) {
-    return { erro: "Data de início inválida." };
-  }
+  const dataInicio = parseCivilDate(parsed.data.dataInicio);
+  if (!dataInicio) return { erro: "Data de início inválida." };
   let dataFim: Date | null = null;
   if (parsed.data.dataFim) {
-    dataFim = new Date(parsed.data.dataFim);
-    if (Number.isNaN(dataFim.getTime())) return { erro: "Data fim inválida." };
+    dataFim = parseCivilDate(parsed.data.dataFim);
+    if (!dataFim) return { erro: "Data fim inválida." };
     if (dataFim < dataInicio) {
       return { erro: "A data fim não pode ser antes do início." };
     }
   }
+
+  // Valida existência/atividade dos IDs antes de criar (evita erro de FK cru)
+  const [funcionario, padrao, turno] = await Promise.all([
+    db.user.findUnique({ where: { id: parsed.data.funcionarioId } }),
+    db.padraoEscala.findUnique({ where: { id: parsed.data.padraoId } }),
+    db.turno.findUnique({ where: { id: parsed.data.turnoId } }),
+  ]);
+  if (!funcionario || !funcionario.ativo) {
+    return { erro: "Funcionário inválido." };
+  }
+  if (!padrao || !padrao.ativo) return { erro: "Padrão inválido." };
+  if (!turno || !turno.ativo) return { erro: "Turno inválido." };
 
   await db.escalaFuncionario.create({
     data: {
@@ -63,6 +75,8 @@ export async function criarEscalaAction(
   });
 
   revalidatePath("/painel/escala/gerenciar");
+  revalidatePath(`/painel/escala/gerenciar/${parsed.data.funcionarioId}`);
+  revalidatePath("/painel/escala");
   return { ok: "Escala atribuída com sucesso." };
 }
 
@@ -73,9 +87,8 @@ export async function encerrarEscalaAction(
 ): Promise<ActionState> {
   await requirePermission("escala.gerenciar");
   const id = String(formData.get("id") ?? "");
-  const dataFimStr = String(formData.get("dataFim") ?? "");
-  const dataFim = new Date(dataFimStr);
-  if (!id || Number.isNaN(dataFim.getTime())) {
+  const dataFim = parseCivilDate(String(formData.get("dataFim") ?? ""));
+  if (!id || !dataFim) {
     return { erro: "Informe uma data de encerramento válida." };
   }
   const escala = await db.escalaFuncionario.findUnique({ where: { id } });
@@ -85,6 +98,8 @@ export async function encerrarEscalaAction(
   }
   await db.escalaFuncionario.update({ where: { id }, data: { dataFim } });
   revalidatePath("/painel/escala/gerenciar");
+  revalidatePath(`/painel/escala/gerenciar/${escala.funcionarioId}`);
+  revalidatePath("/painel/escala");
   return { ok: "Escala encerrada." };
 }
 
@@ -96,9 +111,21 @@ export async function excluirEscalaAction(
   await requirePermission("escala.gerenciar");
   const id = String(formData.get("id") ?? "");
   if (!id) return { erro: "Registro inválido." };
-  await db.escalaFuncionario.delete({ where: { id } });
-  revalidatePath("/painel/escala/gerenciar");
-  return { ok: "Escala removida." };
+  try {
+    const escala = await db.escalaFuncionario.delete({ where: { id } });
+    revalidatePath("/painel/escala/gerenciar");
+    revalidatePath(`/painel/escala/gerenciar/${escala.funcionarioId}`);
+    revalidatePath("/painel/escala");
+    return { ok: "Escala removida." };
+  } catch (e) {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2025"
+    ) {
+      return { erro: "Escala não encontrada." };
+    }
+    return { erro: "Não foi possível remover a escala." };
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -125,7 +152,9 @@ export async function criarTurnoAction(
   if (!parsed.success) {
     return { erro: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
-  const existe = await db.turno.findUnique({ where: { nome: parsed.data.nome } });
+  const existe = await db.turno.findUnique({
+    where: { nome: parsed.data.nome },
+  });
   if (existe) return { erro: "Já existe um turno com esse nome." };
   await db.turno.create({ data: parsed.data });
   revalidatePath("/painel/escala/config");

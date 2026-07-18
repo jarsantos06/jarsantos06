@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { formatCivil } from "@/lib/date";
 import { DecisaoForm } from "../DecisaoForm";
 import { StatusBadge, tipoLabel } from "../ui";
 
@@ -32,7 +33,7 @@ export default async function AprovacoesPage() {
       >
         ← Ocorrências
       </Link>
-      <h1 className="mt-2 mb-6 text-2xl font-semibold text-slate-800">
+      <h1 className="mb-6 mt-2 text-2xl font-semibold text-slate-800">
         Aprovações de ocorrências
       </h1>
 
@@ -58,7 +59,7 @@ export default async function AprovacoesPage() {
                 </div>
                 <p className="mt-1 text-sm text-slate-600">
                   <strong>{tipoLabel(o.tipo)}</strong> em{" "}
-                  {o.dataOcorrencia.toLocaleDateString("pt-BR")}
+                  {formatCivil(o.dataOcorrencia)}
                 </p>
                 <p className="mt-1 text-sm text-slate-500">{o.motivo}</p>
                 {o.evidenciaUrl && (
@@ -86,7 +87,9 @@ export default async function AprovacoesPage() {
       </div>
 
       {/* Histórico de decisões */}
-      <h2 className="mb-3 mt-8 font-semibold text-slate-700">Decididas recentemente</h2>
+      <h2 className="mb-3 mt-8 font-semibold text-slate-700">
+        Decididas recentemente
+      </h2>
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500">
@@ -101,8 +104,12 @@ export default async function AprovacoesPage() {
           <tbody className="divide-y divide-slate-100">
             {decididas.map((o) => (
               <tr key={o.id} className="hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-800">{o.solicitante.nome}</td>
-                <td className="px-4 py-3 text-slate-600">{tipoLabel(o.tipo)}</td>
+                <td className="px-4 py-3 text-slate-800">
+                  {o.solicitante.nome}
+                </td>
+                <td className="px-4 py-3 text-slate-600">
+                  {tipoLabel(o.tipo)}
+                </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={o.status} />
                 </td>
@@ -116,7 +123,10 @@ export default async function AprovacoesPage() {
             ))}
             {decididas.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                <td
+                  colSpan={5}
+                  className="px-4 py-8 text-center text-slate-400"
+                >
                   Nenhuma decisão registrada ainda.
                 </td>
               </tr>

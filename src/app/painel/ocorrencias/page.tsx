@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
 import { can } from "@/lib/rbac";
 import { db } from "@/lib/db";
+import { formatCivil } from "@/lib/date";
 import { NovaOcorrenciaForm } from "./NovaOcorrenciaForm";
 import { StatusBadge, tipoLabel } from "./ui";
 
@@ -26,10 +27,15 @@ export default async function OcorrenciasPage() {
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link href="/painel" className="text-sm text-brand-600 hover:underline">
+          <Link
+            href="/painel"
+            className="text-sm text-brand-600 hover:underline"
+          >
             ← Painel
           </Link>
-          <h1 className="text-2xl font-semibold text-slate-800">📝 Ocorrências</h1>
+          <h1 className="text-2xl font-semibold text-slate-800">
+            📝 Ocorrências
+          </h1>
           <p className="text-slate-500">Registro de faltas e atrasos</p>
         </div>
         {podeAprovar && (
@@ -56,7 +62,9 @@ export default async function OcorrenciasPage() {
 
         {/* Minhas ocorrências */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="mb-4 font-semibold text-slate-800">Minhas ocorrências</h2>
+          <h2 className="mb-4 font-semibold text-slate-800">
+            Minhas ocorrências
+          </h2>
           <ul className="space-y-3">
             {minhas.map((o) => (
               <li
@@ -65,8 +73,7 @@ export default async function OcorrenciasPage() {
               >
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-slate-800">
-                    {tipoLabel(o.tipo)} ·{" "}
-                    {o.dataOcorrencia.toLocaleDateString("pt-BR")}
+                    {tipoLabel(o.tipo)} · {formatCivil(o.dataOcorrencia)}
                   </span>
                   <StatusBadge status={o.status} />
                 </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { DiaEscala } from "@/lib/escala";
-import { NOMES_MES } from "@/lib/escala";
+import { NOMES_MES, primeiroDiaSemanaDoMes } from "@/lib/escala";
 
 const DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
@@ -18,7 +18,7 @@ export function CalendarioEscala({
   const totalTrab = dias.filter((d) => d.trabalha).length;
 
   // Deslocamento do 1º dia (para alinhar na coluna do dia da semana)
-  const primeiroDiaSemana = new Date(ano, mes - 1, 1).getDay();
+  const primeiroDiaSemana = primeiroDiaSemanaDoMes(ano, mes);
 
   const mesAnt = mes === 1 ? 12 : mes - 1;
   const anoAnt = mes === 1 ? ano - 1 : ano;
@@ -61,7 +61,7 @@ export function CalendarioEscala({
           <div key={`vazio-${i}`} />
         ))}
         {dias.map((d) => {
-          const numero = d.dia.getDate();
+          const numero = d.numero;
           return (
             <div
               key={numero}

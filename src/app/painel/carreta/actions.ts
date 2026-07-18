@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth";
@@ -25,6 +26,12 @@ async function gerarTicket(): Promise<string> {
   });
   const seq = String(doDia + 1).padStart(4, "0");
   return `TRV-${y}${m}${d}-${seq}`;
+}
+
+function ehColisaoUnica(e: unknown): boolean {
+  return (
+    e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002"
+  );
 }
 
 const placaSchema = z
@@ -57,32 +64,33 @@ export async function travarAction(
   const up = await salvarUpload(foto, "carretas");
   if (up.erro || !up.url) return { erro: up.erro ?? "Falha no upload." };
 
-  // ticket + data/hora são gerados automaticamente pelo sistema
-  let ticket = await gerarTicket();
-  try {
-    await db.travamento.create({
-      data: {
-        placa,
-        ticket,
-        fotoUrl: up.url,
-        observacao,
-        operadorId: sessao.userId,
-        status: "TRAVADA",
-      },
-    });
-  } catch {
-    // colisão rara de ticket sob concorrência: tenta uma vez com sufixo
-    ticket = `${ticket}-${Math.floor(Date.now() % 1000)}`;
-    await db.travamento.create({
-      data: {
-        placa,
-        ticket,
-        fotoUrl: up.url,
-        observacao,
-        operadorId: sessao.userId,
-        status: "TRAVADA",
-      },
-    });
+  // ticket + data/hora são gerados automaticamente pelo sistema.
+  // Sob concorrência, dois tickets podem colidir na sequência do dia; a
+  // restrição @unique protege a integridade e aqui reprocessamos com o
+  // MESMO formato (recalculando a sequência) até um número livre.
+  let ticket = "";
+  let criado = false;
+  for (let tentativa = 0; tentativa < 6 && !criado; tentativa++) {
+    ticket = await gerarTicket();
+    try {
+      await db.travamento.create({
+        data: {
+          placa,
+          ticket,
+          fotoUrl: up.url,
+          observacao,
+          operadorId: sessao.userId,
+          status: "TRAVADA",
+        },
+      });
+      criado = true;
+    } catch (e) {
+      if (ehColisaoUnica(e)) continue; // ticket ocupado: tenta o próximo
+      throw e;
+    }
+  }
+  if (!criado) {
+    return { erro: "Não foi possível gerar o ticket. Tente novamente." };
   }
 
   revalidatePath("/painel/carreta");

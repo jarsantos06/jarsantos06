@@ -53,7 +53,10 @@ export async function criarMaterialAction(
 const movimentacaoSchema = z.object({
   materialId: z.string().min(1),
   tipo: z.enum(["ENTRADA", "SAIDA"]),
-  quantidade: z.coerce.number().int().positive("Quantidade deve ser maior que zero."),
+  quantidade: z.coerce
+    .number()
+    .int()
+    .positive("Quantidade deve ser maior que zero."),
   destino: z.string().trim().max(120).optional(),
   observacao: z.string().trim().max(300).optional(),
 });
@@ -87,20 +90,30 @@ export async function movimentarAction(
         throw new Error("Material não encontrado.");
       }
 
-      const saldoApos =
-        tipo === "ENTRADA"
-          ? material.saldo + quantidade
-          : material.saldo - quantidade;
-
-      if (tipo === "SAIDA" && saldoApos < 0) {
-        throw new Error(
-          `Saldo insuficiente. Disponível: ${material.saldo} ${material.unidade}.`,
-        );
+      if (tipo === "SAIDA") {
+        // Update condicional ATÔMICO: só decrementa se houver saldo suficiente.
+        // Evita "lost update" sob concorrência (dois SAIDA simultâneos) — o
+        // banco garante o invariante, não a leitura anterior.
+        const r = await tx.material.updateMany({
+          where: { id: materialId, ativo: true, saldo: { gte: quantidade } },
+          data: { saldo: { decrement: quantidade } },
+        });
+        if (r.count === 0) {
+          throw new Error(
+            `Saldo insuficiente. Disponível: ${material.saldo} ${material.unidade}.`,
+          );
+        }
+      } else {
+        await tx.material.update({
+          where: { id: materialId },
+          data: { saldo: { increment: quantidade } },
+        });
       }
 
-      await tx.material.update({
+      // Lê o saldo já atualizado para registrar na trilha de auditoria
+      const atualizado = await tx.material.findUnique({
         where: { id: materialId },
-        data: { saldo: saldoApos },
+        select: { saldo: true },
       });
 
       await tx.movimentacaoMaterial.create({
@@ -108,7 +121,7 @@ export async function movimentarAction(
           materialId,
           tipo,
           quantidade,
-          saldoApos,
+          saldoApos: atualizado!.saldo,
           destino,
           observacao,
           usuarioId: sessao.userId,

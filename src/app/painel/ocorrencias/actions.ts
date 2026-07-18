@@ -5,6 +5,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth";
 import { salvarUpload } from "@/lib/upload";
+import { parseCivilDate } from "@/lib/date";
 
 export type ActionState = { erro?: string; ok?: string };
 
@@ -14,7 +15,11 @@ export type ActionState = { erro?: string; ok?: string };
 const ocorrenciaSchema = z.object({
   tipo: z.enum(["FALTA", "ATRASO"]),
   dataOcorrencia: z.string().min(1, "Informe a data da ocorrência."),
-  motivo: z.string().trim().min(5, "Descreva o motivo (mín. 5 caracteres).").max(600),
+  motivo: z
+    .string()
+    .trim()
+    .min(5, "Descreva o motivo (mín. 5 caracteres).")
+    .max(600),
 });
 
 export async function criarOcorrenciaAction(
@@ -32,8 +37,8 @@ export async function criarOcorrenciaAction(
     return { erro: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
 
-  const data = new Date(parsed.data.dataOcorrencia);
-  if (Number.isNaN(data.getTime())) {
+  const data = parseCivilDate(parsed.data.dataOcorrencia);
+  if (!data) {
     return { erro: "Data da ocorrência inválida." };
   }
 
