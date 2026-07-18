@@ -2,6 +2,7 @@
 
 import { useActionState, useRef } from "react";
 import { criarOcorrenciaAction, type ActionState } from "./actions";
+import { Field, Input, Select, Textarea, Button, Alert } from "@/components/ui";
 
 const inicial: ActionState = {};
 
@@ -21,81 +22,45 @@ export function NovaOcorrenciaForm({ nomeUsuario }: { nomeUsuario: string }) {
       }}
       className="space-y-4"
     >
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">
-          Funcionário
-        </span>
-        <input
-          value={nomeUsuario}
-          disabled
-          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-slate-500"
-        />
-      </label>
+      <Field label="Funcionário">
+        <Input value={nomeUsuario} disabled />
+      </Field>
 
       <div className="grid grid-cols-2 gap-3">
-        <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">Tipo</span>
-          <select
-            name="tipo"
-            defaultValue="FALTA"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-          >
+        <Field label="Tipo">
+          <Select name="tipo" defaultValue="FALTA">
             <option value="FALTA">Falta</option>
             <option value="ATRASO">Atraso</option>
-          </select>
-        </label>
-        <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">
-            Data da ocorrência
-          </span>
-          <input
-            name="dataOcorrencia"
-            type="date"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-          />
-        </label>
+          </Select>
+        </Field>
+        <Field label="Data da ocorrência">
+          <Input name="dataOcorrencia" type="date" />
+        </Field>
       </div>
 
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">Motivo</span>
-        <textarea
+      <Field label="Motivo">
+        <Textarea
           name="motivo"
           rows={3}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
           placeholder="Descreva o motivo da falta ou atraso"
         />
-      </label>
+      </Field>
 
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">
-          Evidência <span className="text-slate-400">(opcional — imagem)</span>
-        </span>
-        <input
+      <Field label="Evidência" hint="(opcional — imagem)">
+        <Input
           name="evidencia"
           type="file"
           accept="image/*"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-600 outline-none file:mr-3 file:rounded file:border-0 file:bg-brand-50 file:px-3 file:py-1 file:text-brand-700"
+          className="file:mr-3 file:rounded file:border-0 file:bg-brand-50 file:px-3 file:py-1 file:text-brand-700"
         />
-      </label>
+      </Field>
 
-      {state.erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-          {state.erro}
-        </p>
-      )}
-      {state.ok && (
-        <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
-          {state.ok}
-        </p>
-      )}
+      {state.erro && <Alert tone="danger">{state.erro}</Alert>}
+      {state.ok && <Alert tone="success">{state.ok}</Alert>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-lg bg-brand-600 py-2.5 font-medium text-white hover:bg-brand-700 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Enviando..." : "Enviar para aprovação"}
-      </button>
+      </Button>
     </form>
   );
 }

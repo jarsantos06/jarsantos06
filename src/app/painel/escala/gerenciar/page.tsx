@@ -3,6 +3,7 @@ import { requirePermission } from "@/lib/auth";
 import { roleLabel } from "@/lib/rbac";
 import { db } from "@/lib/db";
 import { atribuicaoDoDia, type AtribuicaoEscala } from "@/lib/escala";
+import { PageHeader, Card, btn } from "@/components/ui";
 
 export default async function GerenciarEscalaPage() {
   await requirePermission("escala.gerenciar");
@@ -35,10 +36,9 @@ export default async function GerenciarEscalaPage() {
     });
     porFuncionario.set(e.funcionarioId, arr);
   }
-  // Nome do padrão vigente (recupera do registro para exibir "2x2" etc.)
+  // Nome do padrão vigente por funcionário
   const padraoAtualNome = new Map<string, string>();
   for (const e of escalas) {
-    // guardamos o nome do padrão associado à atribuição vigente mais recente
     const atual = atribuicaoDoDia(
       porFuncionario.get(e.funcionarioId) ?? [],
       hoje,
@@ -52,37 +52,37 @@ export default async function GerenciarEscalaPage() {
     }
   }
 
+  const semEscala = usuarios.filter(
+    (u) => !atribuicaoDoDia(porFuncionario.get(u.id) ?? [], hoje),
+  ).length;
+
   return (
     <div className="mx-auto max-w-4xl">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <Link
-            href="/painel/escala"
-            className="text-sm text-brand-600 hover:underline"
-          >
-            ← Minha escala
-          </Link>
-          <h1 className="text-2xl font-semibold text-slate-800">
-            Gerenciar escalas da equipe
-          </h1>
-        </div>
-        <div className="flex gap-2">
-          <Link
-            href="/painel/escala/config"
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
-          >
-            ⚙️ Turnos e padrões
-          </Link>
-          <Link
-            href="/painel/escala/nova"
-            className="rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700"
-          >
-            + Nova escala
-          </Link>
-        </div>
-      </div>
+      <PageHeader
+        voltarHref="/painel/escala"
+        voltarLabel="Minha escala"
+        titulo="Gerenciar escalas da equipe"
+        subtitulo={
+          semEscala > 0
+            ? `${semEscala} funcionário(s) sem escala vigente`
+            : "Toda a equipe tem escala vigente"
+        }
+        acoes={
+          <>
+            <Link
+              href="/painel/escala/config"
+              className={btn("secondary", "sm")}
+            >
+              ⚙️ Turnos e padrões
+            </Link>
+            <Link href="/painel/escala/nova" className={btn("primary", "sm")}>
+              + Nova escala
+            </Link>
+          </>
+        }
+      />
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <Card className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500">
             <tr>
@@ -135,7 +135,7 @@ export default async function GerenciarEscalaPage() {
             })}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

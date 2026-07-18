@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
 import { roleLabel } from "@/lib/rbac";
 import { db } from "@/lib/db";
+import { PageHeader, Card } from "@/components/ui";
 import { NovaEscalaForm } from "./NovaEscalaForm";
 
 export default async function NovaEscalaPage({
@@ -23,16 +23,12 @@ export default async function NovaEscalaPage({
 
   return (
     <div className="mx-auto max-w-lg">
-      <Link
-        href="/painel/escala/gerenciar"
-        className="text-sm text-brand-600 hover:underline"
-      >
-        ← Equipe
-      </Link>
-      <h1 className="mb-6 mt-2 text-2xl font-semibold text-slate-800">
-        Nova escala
-      </h1>
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+      <PageHeader
+        voltarHref="/painel/escala/gerenciar"
+        voltarLabel="Equipe"
+        titulo="Nova escala"
+      />
+      <Card className="p-6">
         <NovaEscalaForm
           funcionarioIdInicial={funcionarioId}
           funcionarios={usuarios.map((u) => ({
@@ -48,7 +44,7 @@ export default async function NovaEscalaPage({
             label: `${t.nome} (${t.horaInicio}–${t.horaFim})`,
           }))}
         />
-      </div>
+      </Card>
     </div>
   );
 }

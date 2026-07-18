@@ -5,6 +5,7 @@ import { roleLabel } from "@/lib/rbac";
 import { db } from "@/lib/db";
 import { montarMes } from "@/lib/escala";
 import { formatCivil } from "@/lib/date";
+import { PageHeader, Card, Badge, btn } from "@/components/ui";
 import { CalendarioEscala } from "../../CalendarioEscala";
 import { EscalaAcoes } from "../../EscalaAcoes";
 import { carregarAtribuicoes, resolverMes } from "../../data";
@@ -41,28 +42,20 @@ export default async function FuncionarioEscalaPage({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <Link
-        href="/painel/escala/gerenciar"
-        className="text-sm text-brand-600 hover:underline"
-      >
-        ← Equipe
-      </Link>
-      <div className="mb-6 mt-2 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-800">
-            {funcionario.nome}
-          </h1>
-          <p className="text-sm text-slate-500">
-            {roleLabel(funcionario.role)} · {funcionario.matricula}
-          </p>
-        </div>
-        <Link
-          href={`/painel/escala/nova?funcionarioId=${id}`}
-          className="rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700"
-        >
-          + Nova escala
-        </Link>
-      </div>
+      <PageHeader
+        voltarHref="/painel/escala/gerenciar"
+        voltarLabel="Equipe"
+        titulo={funcionario.nome}
+        subtitulo={`${roleLabel(funcionario.role)} · ${funcionario.matricula}`}
+        acoes={
+          <Link
+            href={`/painel/escala/nova?funcionarioId=${id}`}
+            className={btn("primary", "sm")}
+          >
+            + Nova escala
+          </Link>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <CalendarioEscala
@@ -72,7 +65,7 @@ export default async function FuncionarioEscalaPage({
           basePath={`/painel/escala/gerenciar/${id}`}
         />
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <Card className="p-5">
           <h2 className="mb-4 font-semibold text-slate-800">
             Atribuições de escala
           </h2>
@@ -93,17 +86,16 @@ export default async function FuncionarioEscalaPage({
                         ({r.turno.horaInicio}–{r.turno.horaFim})
                       </span>
                     </span>
-                    {vigente && (
-                      <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
-                        vigente
-                      </span>
-                    )}
+                    {vigente && <Badge tone="green">vigente</Badge>}
+                    {encerrada && <Badge tone="slate">encerrada</Badge>}
                   </div>
                   <p className="mt-1 text-xs text-slate-500">
                     Início: {formatCivil(r.dataInicio)}
                     {r.dataFim
                       ? ` · Fim: ${formatCivil(r.dataFim)}`
                       : " · padronizada (sem fim)"}
+                    {" · por "}
+                    {r.criadoPor.nome}
                   </p>
                   {r.observacao && (
                     <p className="mt-1 text-xs text-slate-400">
@@ -122,7 +114,7 @@ export default async function FuncionarioEscalaPage({
               </li>
             )}
           </ul>
-        </div>
+        </Card>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { criarEscalaAction, type ActionState } from "../actions";
+import { Field, Input, Select, Button, Alert } from "@/components/ui";
 
 const inicial: ActionState = {};
 
@@ -26,15 +27,8 @@ export function NovaEscalaForm({
 
   return (
     <form action={formAction} className="space-y-4">
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">
-          Funcionário
-        </span>
-        <select
-          name="funcionarioId"
-          defaultValue={funcionarioIdInicial ?? ""}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-        >
+      <Field label="Funcionário">
+        <Select name="funcionarioId" defaultValue={funcionarioIdInicial ?? ""}>
           <option value="" disabled>
             Selecione...
           </option>
@@ -43,17 +37,12 @@ export function NovaEscalaForm({
               {f.label}
             </option>
           ))}
-        </select>
-      </label>
+        </Select>
+      </Field>
 
       <div className="grid grid-cols-2 gap-3">
-        <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">Padrão</span>
-          <select
-            name="padraoId"
-            defaultValue=""
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-          >
+        <Field label="Padrão">
+          <Select name="padraoId" defaultValue="">
             <option value="" disabled>
               Selecione...
             </option>
@@ -62,15 +51,10 @@ export function NovaEscalaForm({
                 {p.label}
               </option>
             ))}
-          </select>
-        </label>
-        <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">Turno</span>
-          <select
-            name="turnoId"
-            defaultValue=""
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-          >
+          </Select>
+        </Field>
+        <Field label="Turno">
+          <Select name="turnoId" defaultValue="">
             <option value="" disabled>
               Selecione...
             </option>
@@ -79,69 +63,40 @@ export function NovaEscalaForm({
                 {t.label}
               </option>
             ))}
-          </select>
-        </label>
+          </Select>
+        </Field>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">
-            Início do ciclo
-          </span>
-          <input
-            name="dataInicio"
-            type="date"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-          />
-        </label>
-        <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">
-            Fim <span className="text-slate-400">(opcional)</span>
-          </span>
-          <input
-            name="dataFim"
-            type="date"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-          />
-        </label>
+        <Field label="Início do ciclo">
+          <Input name="dataInicio" type="date" />
+        </Field>
+        <Field label="Fim" hint="(opcional)">
+          <Input name="dataFim" type="date" />
+        </Field>
       </div>
       <p className="-mt-2 text-xs text-slate-400">
         Deixe o fim em branco para a escala ser <strong>padronizada</strong>{" "}
         (repete o ciclo automaticamente até uma nova escala substituí-la).
       </p>
 
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">
-          Observação <span className="text-slate-400">(opcional)</span>
-        </span>
-        <input
-          name="observacao"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-          placeholder="Ex.: cobertura de férias"
-        />
-      </label>
+      <Field label="Observação" hint="(opcional)">
+        <Input name="observacao" placeholder="Ex.: cobertura de férias" />
+      </Field>
 
-      {state.erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-          {state.erro}
-        </p>
-      )}
+      {state.erro && <Alert tone="danger">{state.erro}</Alert>}
       {state.ok && (
-        <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
+        <Alert tone="success">
           {state.ok}{" "}
           <Link href="/painel/escala/gerenciar" className="underline">
             Ver equipe
           </Link>
-        </p>
+        </Alert>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-lg bg-brand-600 py-2.5 font-medium text-white hover:bg-brand-700 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Salvando..." : "Atribuir escala"}
-      </button>
+      </Button>
     </form>
   );
 }

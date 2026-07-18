@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { formatCivil } from "@/lib/date";
+import { PageHeader, Card, EmptyState } from "@/components/ui";
 import { DecisaoForm } from "../DecisaoForm";
 import { StatusBadge, tipoLabel } from "../ui";
 
@@ -27,28 +27,19 @@ export default async function AprovacoesPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <Link
-        href="/painel/ocorrencias"
-        className="text-sm text-brand-600 hover:underline"
-      >
-        ← Ocorrências
-      </Link>
-      <h1 className="mb-6 mt-2 text-2xl font-semibold text-slate-800">
-        Aprovações de ocorrências
-      </h1>
+      <PageHeader
+        voltarHref="/painel/ocorrencias"
+        voltarLabel="Ocorrências"
+        titulo="Aprovações de ocorrências"
+        subtitulo={`${pendentes.length} pendente(s) aguardando sua decisão`}
+      />
 
       {/* Pendentes */}
-      <h2 className="mb-3 font-semibold text-slate-700">
-        Pendentes ({pendentes.length})
-      </h2>
       <div className="space-y-4">
         {pendentes.map((o) => (
-          <div
-            key={o.id}
-            className="rounded-2xl border border-slate-200 bg-white p-5"
-          >
+          <Card key={o.id} className="p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-slate-800">
                     {o.solicitante.nome}
@@ -60,6 +51,9 @@ export default async function AprovacoesPage() {
                 <p className="mt-1 text-sm text-slate-600">
                   <strong>{tipoLabel(o.tipo)}</strong> em{" "}
                   {formatCivil(o.dataOcorrencia)}
+                  <span className="ml-2 text-xs text-slate-400">
+                    registrada em {o.createdAt.toLocaleDateString("pt-BR")}
+                  </span>
                 </p>
                 <p className="mt-1 text-sm text-slate-500">{o.motivo}</p>
                 {o.evidenciaUrl && (
@@ -69,7 +63,7 @@ export default async function AprovacoesPage() {
                     rel="noreferrer"
                     className="text-xs text-brand-600 hover:underline"
                   >
-                    ver evidência
+                    📎 ver evidência
                   </a>
                 )}
               </div>
@@ -77,12 +71,14 @@ export default async function AprovacoesPage() {
                 <DecisaoForm id={o.id} />
               </div>
             </div>
-          </div>
+          </Card>
         ))}
         {pendentes.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-400">
-            Nenhuma ocorrência pendente. 🎉
-          </div>
+          <EmptyState
+            emoji="🎉"
+            titulo="Nenhuma ocorrência pendente"
+            descricao="Quando um funcionário registrar uma falta ou atraso, ela aparece aqui."
+          />
         )}
       </div>
 
@@ -90,7 +86,7 @@ export default async function AprovacoesPage() {
       <h2 className="mb-3 mt-8 font-semibold text-slate-700">
         Decididas recentemente
       </h2>
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <Card className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500">
             <tr>
@@ -133,7 +129,7 @@ export default async function AprovacoesPage() {
             )}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

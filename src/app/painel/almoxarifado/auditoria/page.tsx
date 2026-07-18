@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { PageHeader, Card, Badge, StatCard } from "@/components/ui";
 
 export default async function AuditoriaPage() {
   await requirePermission("almoxarifado.auditar");
@@ -20,26 +20,24 @@ export default async function AuditoriaPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <Link
-        href="/painel/almoxarifado"
-        className="text-sm text-brand-600 hover:underline"
-      >
-        ← Almoxarifado
-      </Link>
-      <h1 className="mb-1 mt-2 text-2xl font-semibold text-slate-800">
-        📊 Auditoria de movimentações
-      </h1>
-      <p className="mb-6 text-slate-500">
-        Trilha completa — visível apenas para o Supervisor.
-      </p>
+      <PageHeader
+        voltarHref="/painel/almoxarifado"
+        voltarLabel="Almoxarifado"
+        titulo="📊 Auditoria de movimentações"
+        subtitulo="Trilha completa — visível apenas para o Supervisor"
+      />
 
-      <div className="mb-6 grid grid-cols-3 gap-4">
-        <Card titulo="Total de registros" valor={movimentacoes.length} />
-        <Card titulo="Entradas" valor={entradas} cor="text-green-700" />
-        <Card titulo="Saídas" valor={saidas} cor="text-red-600" />
+      <div className="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
+        <StatCard
+          label="Exibindo"
+          valor={movimentacoes.length}
+          hint="últimos registros"
+        />
+        <StatCard label="Entradas (total)" valor={entradas} tone="green" />
+        <StatCard label="Saídas (total)" valor={saidas} tone="red" />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <Card className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500">
             <tr>
@@ -69,15 +67,9 @@ export default async function AuditoriaPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <span
-                    className={
-                      mv.tipo === "ENTRADA"
-                        ? "rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700"
-                        : "rounded bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600"
-                    }
-                  >
+                  <Badge tone={mv.tipo === "ENTRADA" ? "green" : "red"}>
                     {mv.tipo === "ENTRADA" ? "Entrada" : "Saída"}
-                  </span>
+                  </Badge>
                 </td>
                 <td className="px-4 py-3 text-right text-slate-700">
                   {mv.quantidade} {mv.material.unidade}
@@ -103,24 +95,7 @@ export default async function AuditoriaPage() {
             )}
           </tbody>
         </table>
-      </div>
-    </div>
-  );
-}
-
-function Card({
-  titulo,
-  valor,
-  cor = "text-slate-800",
-}: {
-  titulo: string;
-  valor: number;
-  cor?: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <p className="text-sm text-slate-500">{titulo}</p>
-      <p className={`text-3xl font-bold ${cor}`}>{valor}</p>
+      </Card>
     </div>
   );
 }

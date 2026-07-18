@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requirePermission } from "@/lib/auth";
 import { can } from "@/lib/rbac";
 import { db } from "@/lib/db";
+import { Card, Badge, btn } from "@/components/ui";
 import { MovimentarForm } from "../MovimentarForm";
 
 export default async function MaterialPage({
@@ -12,6 +13,7 @@ export default async function MaterialPage({
 }) {
   const sessao = await requirePermission("almoxarifado.ver");
   const podeMovimentar = can(sessao.role, "almoxarifado.movimentar");
+  const podeGerenciar = can(sessao.role, "almoxarifado.gerenciar");
   const { id } = await params;
 
   const material = await db.material.findUnique({
@@ -31,24 +33,33 @@ export default async function MaterialPage({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <Link
-        href="/painel/almoxarifado"
-        className="text-sm text-brand-600 hover:underline"
-      >
-        ← Almoxarifado
-      </Link>
-
-      <div className="mb-6 mt-2">
-        <h1 className="text-2xl font-semibold text-slate-800">
-          {material.nome}
-        </h1>
-        <p className="font-mono text-sm text-slate-500">{material.codigo}</p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <Link
+            href="/painel/almoxarifado"
+            className="text-sm text-brand-600 hover:underline"
+          >
+            ← Almoxarifado
+          </Link>
+          <h1 className="text-2xl font-semibold text-slate-800">
+            {material.nome}
+          </h1>
+          <p className="font-mono text-sm text-slate-500">{material.codigo}</p>
+        </div>
+        {podeGerenciar && (
+          <Link
+            href={`/painel/almoxarifado/${material.id}/editar`}
+            className={btn("secondary", "sm")}
+          >
+            ✏️ Editar
+          </Link>
+        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Saldo + movimentação */}
         <div className="space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <Card className="p-5">
             <p className="text-sm text-slate-500">Saldo atual</p>
             <p
               className={
@@ -61,13 +72,18 @@ export default async function MaterialPage({
               <span className="text-lg font-normal text-slate-500">
                 {material.unidade}
               </span>
+              {baixo && (
+                <span className="ml-2 align-middle">
+                  <Badge tone="red">estoque baixo</Badge>
+                </span>
+              )}
             </p>
             <p className="text-xs text-slate-400">
               Estoque mínimo: {material.estoqueMinimo} {material.unidade}
             </p>
-          </div>
+          </Card>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <Card className="p-5">
             <h2 className="mb-4 font-semibold text-slate-800">
               Nova movimentação
             </h2>
@@ -76,11 +92,11 @@ export default async function MaterialPage({
               unidade={material.unidade}
               podeMovimentar={podeMovimentar}
             />
-          </div>
+          </Card>
         </div>
 
         {/* Histórico */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <Card className="p-5">
           <h2 className="mb-4 font-semibold text-slate-800">
             Últimas movimentações
           </h2>
@@ -124,7 +140,7 @@ export default async function MaterialPage({
               </li>
             )}
           </ul>
-        </div>
+        </Card>
       </div>
     </div>
   );

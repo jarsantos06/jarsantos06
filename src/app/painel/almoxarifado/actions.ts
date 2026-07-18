@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth";
@@ -44,6 +45,48 @@ export async function criarMaterialAction(
   await db.material.create({ data: { ...parsed.data, saldo: 0 } });
   revalidatePath("/painel/almoxarifado");
   return { ok: "Material cadastrado com sucesso." };
+}
+
+// ---------------------------------------------------------------------------
+// Edição de material (somente Supervisor). Não altera o saldo — este só
+// muda por movimentação, preservando a trilha de auditoria.
+// ---------------------------------------------------------------------------
+const edicaoSchema = z.object({
+  id: z.string().min(1),
+  nome: z.string().trim().min(2, "Informe o nome do material.").max(120),
+  categoria: z.enum(["USO_DIARIO", "LIMPEZA"]),
+  unidade: z.string().trim().min(1).max(10),
+  estoqueMinimo: z.coerce.number().int().min(0),
+  ativo: z.enum(["on", "off"]).optional(),
+});
+
+export async function editarMaterialAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requirePermission("almoxarifado.gerenciar");
+
+  const parsed = edicaoSchema.safeParse({
+    id: formData.get("id"),
+    nome: formData.get("nome"),
+    categoria: formData.get("categoria"),
+    unidade: formData.get("unidade") || "UN",
+    estoqueMinimo: formData.get("estoqueMinimo") || 0,
+    ativo: formData.get("ativo") ?? "off",
+  });
+  if (!parsed.success) {
+    return { erro: parsed.error.issues[0]?.message ?? "Dados inválidos." };
+  }
+
+  const { id, nome, categoria, unidade, estoqueMinimo, ativo } = parsed.data;
+  await db.material.update({
+    where: { id },
+    data: { nome, categoria, unidade, estoqueMinimo, ativo: ativo === "on" },
+  });
+
+  revalidatePath("/painel/almoxarifado");
+  revalidatePath(`/painel/almoxarifado/${id}`);
+  redirect(`/painel/almoxarifado/${id}`);
 }
 
 // ---------------------------------------------------------------------------

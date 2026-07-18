@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { movimentarAction, type ActionState } from "./actions";
+import { Field, Input, Select, Textarea, Button, Alert } from "@/components/ui";
 
 const inicial: ActionState = {};
 
@@ -32,73 +33,34 @@ export function MovimentarForm({
       <input type="hidden" name="materialId" value={materialId} />
 
       <div className="grid grid-cols-2 gap-3">
-        <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">Tipo</span>
-          <select
-            name="tipo"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-            defaultValue="ENTRADA"
-          >
+        <Field label="Tipo">
+          <Select name="tipo" defaultValue="ENTRADA">
             <option value="ENTRADA">Entrada</option>
             <option value="SAIDA">Saída</option>
-          </select>
-        </label>
-
-        <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">
-            Quantidade ({unidade})
-          </span>
-          <input
-            name="quantidade"
-            type="number"
-            min={1}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-            placeholder="0"
-          />
-        </label>
+          </Select>
+        </Field>
+        <Field label={`Quantidade (${unidade})`}>
+          <Input name="quantidade" type="number" min={1} placeholder="0" />
+        </Field>
       </div>
 
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">
-          Destino / Origem <span className="text-slate-400">(opcional)</span>
-        </span>
-        <input
+      <Field label="Destino / Origem" hint="(opcional)">
+        <Input
           name="destino"
-          type="text"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
           placeholder="Ex.: Setor de expedição / Fornecedor X"
         />
-      </label>
+      </Field>
 
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">
-          Observação <span className="text-slate-400">(opcional)</span>
-        </span>
-        <textarea
-          name="observacao"
-          rows={2}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
-        />
-      </label>
+      <Field label="Observação" hint="(opcional)">
+        <Textarea name="observacao" rows={2} />
+      </Field>
 
-      {state.erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-          {state.erro}
-        </p>
-      )}
-      {state.ok && (
-        <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
-          {state.ok}
-        </p>
-      )}
+      {state.erro && <Alert tone="danger">{state.erro}</Alert>}
+      {state.ok && <Alert tone="success">{state.ok}</Alert>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-lg bg-brand-600 py-2.5 font-medium text-white hover:bg-brand-700 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Registrando..." : "Registrar movimentação"}
-      </button>
+      </Button>
     </form>
   );
 }
