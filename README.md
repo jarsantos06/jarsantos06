@@ -1,54 +1,116 @@
-<h1 align="center">Olá, eu sou o Aurelio Ribeiro 👋</h1>
+# AppValenLog — Sistema Operacional
 
-<p align="center">
-  <b>Desenvolvedor Full Stack &amp; Product Owner</b><br>
-  Construindo produtos digitais do conceito ao deploy — unindo visão de negócio e código.
-</p>
+[![CI](https://github.com/jarsantos06/appvalenlog/actions/workflows/ci.yml/badge.svg)](https://github.com/jarsantos06/appvalenlog/actions/workflows/ci.yml)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma)
+![Licença](https://img.shields.io/badge/licença-proprietária-red)
 
-<p align="center">
-  <a href="mailto:gestor.jarsantos@gmail.com">
-    <img src="https://img.shields.io/badge/Email-gestor.jarsantos%40gmail.com-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/>
-  </a>
-</p>
+Portal de gestão operacional (logística/pátio) **modular**, com controle de acesso por papéis. Cada módulo é desenvolvido de forma isolada e controlada sobre uma base compartilhada de autenticação, permissões e navegação.
 
----
+## ✨ Módulos
 
-### 🚀 Sobre mim
+| Módulo                       | O que faz                                                                            | Opera                                | Audita / Aprova                     |
+| ---------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------ | ----------------------------------- |
+| 📦 **Almoxarifado**          | Entrada/saída de materiais (uso diário e limpeza) com bloqueio de saldo negativo     | Controlador, Encarregado, Supervisor | Cadastro e auditoria: só Supervisor |
+| 🚛 **Travamento de Carreta** | Trava/destrava carretas no pátio com placa, foto, ticket e data/hora automáticos     | Controlador, Encarregado             | —                                   |
+| 📝 **Ocorrências**           | Ficha de falta/atraso com evidência e fluxo de aprovação                             | Todos os funcionários                | Aprovam: Supervisor e Gerente       |
+| 📅 **Escala / Turnos**       | Escalas por padrão (2x2, 6x1, 5x2) e turno, com cálculo automático de trabalha/folga | Funcionário vê a própria             | Monta/edita: Supervisor e Gerente   |
 
-- 💻 Atuo como **Desenvolvedor Full Stack**, do back-end ao front-end.
-- 📋 Tenho experiência como **Product Owner**, conectando necessidades de negócio à entrega técnica.
-- 🎯 Foco em escrever código limpo, escalável e orientado a produto.
-- 🌱 Sempre estudando novas tecnologias e boas práticas de engenharia.
+## 🧱 Stack
 
----
+- **[Next.js 16](https://nextjs.org/)** (App Router) + **TypeScript**
+- **[Prisma](https://www.prisma.io/)** ORM — **SQLite** em dev, pronto para **PostgreSQL** em produção
+- **[Tailwind CSS](https://tailwindcss.com/)**
+- Autenticação por sessão (JWT em cookie `httpOnly`) + middleware
+- RBAC centralizado (`src/lib/rbac.ts`)
 
-### 🛠️ Tecnologias & Ferramentas
+## 👥 Papéis de acesso
 
-![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
-![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+`Funcionário` · `Controlador` · `Encarregado` · `Supervisor` · `Gerente`
 
----
+## 🚀 Começando
 
-### 🧩 Competências de Product Owner
+Pré-requisitos: **Node.js 22+**.
 
-`Gestão de Backlog` · `Histórias de Usuário` · `Priorização` · `Metodologias Ágeis (Scrum)` · `Visão de Produto` · `Comunicação com Stakeholders`
+```bash
+# 1. Instale as dependências
+npm install
 
----
+# 2. Configure o ambiente
+cp .env.example .env        # ajuste SESSION_SECRET
 
-### 📊 Estatísticas do GitHub
+# 3. Crie o banco e popule dados de exemplo
+npm run db:push
+npm run seed
 
-<p align="center">
-  <img height="165" src="https://github-readme-stats.vercel.app/api?username=jarsantos06&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" alt="GitHub Stats"/>
-  <img height="165" src="https://github-readme-stats.vercel.app/api/top-langs/?username=jarsantos06&layout=compact&theme=tokyonight&hide_border=true&langs_count=6" alt="Top Languages"/>
-</p>
+# 4. Suba o servidor de desenvolvimento
+npm run dev                 # http://localhost:3000
+```
 
----
+### Usuários de exemplo (senha `123456`)
 
-<p align="center">
-  <i>"Transformando ideias em produtos, uma linha de código por vez."</i>
-</p>
+| Matrícula | Nome                | Papel       |
+| --------- | ------------------- | ----------- |
+| `1001`    | Ana Funcionária     | Funcionário |
+| `2001`    | Carlos Controlador  | Controlador |
+| `3001`    | Eduardo Encarregado | Encarregado |
+| `4001`    | Sônia Supervisora   | Supervisor  |
+| `5001`    | Gustavo Gerente     | Gerente     |
+
+## 📜 Scripts
+
+| Comando             | Descrição                       |
+| ------------------- | ------------------------------- |
+| `npm run dev`       | Servidor de desenvolvimento     |
+| `npm run build`     | Build de produção               |
+| `npm start`         | Sobe o build de produção        |
+| `npm run lint`      | Verifica o código com ESLint    |
+| `npm run format`    | Formata o código com Prettier   |
+| `npm run typecheck` | Checagem de tipos (sem emitir)  |
+| `npm run db:push`   | Sincroniza o schema com o banco |
+| `npm run seed`      | Popula dados de exemplo         |
+| `npm run db:studio` | Abre o Prisma Studio            |
+
+## 🗂️ Estrutura
+
+```
+src/
+├── app/
+│   ├── login/                 # autenticação
+│   ├── api/auth/logout/       # encerrar sessão
+│   └── painel/                # portal (protegido por middleware)
+│       ├── almoxarifado/      # Módulo 1
+│       ├── carreta/           # Módulo 2
+│       ├── ocorrencias/       # Módulo 3
+│       └── escala/            # Módulo 4
+├── lib/
+│   ├── db.ts                  # cliente Prisma (singleton)
+│   ├── rbac.ts                # papéis e permissões (regra central)
+│   ├── auth.ts                # requireUser / requirePermission
+│   ├── session.ts             # sessão JWT
+│   ├── navigation.ts          # registro de módulos do portal
+│   ├── upload.ts              # armazenamento de imagens (abstraído)
+│   └── escala.ts              # cálculo de escala (funções puras)
+└── middleware.ts              # proteção de rotas
+prisma/
+├── schema.prisma              # modelo de dados
+└── seed.ts                    # dados iniciais
+```
+
+## ➕ Adicionando um novo módulo
+
+1. Modele os dados em `prisma/schema.prisma` e rode `npm run db:push`
+2. Declare as permissões em `src/lib/rbac.ts` (`Permission` + matriz `PERMISSOES`)
+3. Registre o módulo em `src/lib/navigation.ts` (aparece no portal só para quem tem a permissão)
+4. Crie as páginas em `src/app/painel/<modulo>/`, protegendo com `requirePermission(...)`
+
+## 🔒 Produção
+
+- Trocar o `provider` do Prisma para `postgresql` e ajustar `DATABASE_URL`
+- Definir um `SESSION_SECRET` forte e secreto
+- Substituir o armazenamento local de `src/lib/upload.ts` por um bucket (S3/nuvem)
+
+## 📄 Licença
+
+Software **proprietário** — todos os direitos reservados. Veja [LICENSE](./LICENSE).

@@ -16,12 +16,12 @@ Portal de gestão operacional modular (logística/pátio) com controle de acesso
 
 ## Módulos
 
-| Módulo | O que faz | Quem opera | Quem audita/aprova |
-|---|---|---|---|
-| **📦 Almoxarifado** | Entrada/saída de materiais (uso diário e limpeza), com bloqueio de saldo negativo | Controlador, Encarregado, Supervisor | Auditoria: só Supervisor. Cadastro de material: só Supervisor |
-| **🚛 Travamento de Carreta** | Trava/destrava carretas no pátio com placa, foto, ticket e data/hora automáticos | Controlador, Encarregado | — |
-| **📝 Ocorrências** | Ficha de falta/atraso com evidência e fluxo de aprovação | Todos os funcionários criam | Aprovam: Supervisor e Gerente |
-| **📅 Escala / Turnos** | Escalas por padrão (2x2, 6x1, 5x2) e turno; cálculo automático de trabalha/folga a partir da data de início (padronizável) | Funcionário vê só a própria | Monta/edita: Supervisor e Gerente |
+| Módulo                       | O que faz                                                                                                                  | Quem opera                           | Quem audita/aprova                                            |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------- |
+| **📦 Almoxarifado**          | Entrada/saída de materiais (uso diário e limpeza), com bloqueio de saldo negativo                                          | Controlador, Encarregado, Supervisor | Auditoria: só Supervisor. Cadastro de material: só Supervisor |
+| **🚛 Travamento de Carreta** | Trava/destrava carretas no pátio com placa, foto, ticket e data/hora automáticos                                           | Controlador, Encarregado             | —                                                             |
+| **📝 Ocorrências**           | Ficha de falta/atraso com evidência e fluxo de aprovação                                                                   | Todos os funcionários criam          | Aprovam: Supervisor e Gerente                                 |
+| **📅 Escala / Turnos**       | Escalas por padrão (2x2, 6x1, 5x2) e turno; cálculo automático de trabalha/folga a partir da data de início (padronizável) | Funcionário vê só a própria          | Monta/edita: Supervisor e Gerente                             |
 
 ### Como funciona a Escala
 
@@ -39,13 +39,13 @@ npm run dev                   # http://localhost:3000
 
 ### Usuários de teste (senha `123456`)
 
-| Matrícula | Nome | Papel |
-|---|---|---|
-| 1001 | Ana Funcionária | Funcionário |
-| 2001 | Carlos Controlador | Controlador |
-| 3001 | Eduardo Encarregado | Encarregado |
-| 4001 | Sônia Supervisora | Supervisor |
-| 5001 | Gustavo Gerente | Gerente |
+| Matrícula | Nome                | Papel       |
+| --------- | ------------------- | ----------- |
+| 1001      | Ana Funcionária     | Funcionário |
+| 2001      | Carlos Controlador  | Controlador |
+| 3001      | Eduardo Encarregado | Encarregado |
+| 4001      | Sônia Supervisora   | Supervisor  |
+| 5001      | Gustavo Gerente     | Gerente     |
 
 ## Estrutura
 
