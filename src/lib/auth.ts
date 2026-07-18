@@ -1,7 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { db } from "./db";
-import { getSession, destroySession, type SessionPayload } from "./session";
+import { getSession, type SessionPayload } from "./session";
 import { can, type Permission } from "./rbac";
 
 /**
@@ -21,8 +21,10 @@ export async function requireUser(): Promise<SessionPayload> {
   });
 
   if (!user || !user.ativo) {
-    await destroySession();
-    redirect("/login");
+    // Cookies não podem ser modificados durante a renderização (Server
+    // Component) — apenas em Server Action ou Route Handler. Redireciona
+    // para o handler de logout, que apaga a sessão e leva ao login.
+    redirect("/api/auth/logout");
   }
 
   return {
