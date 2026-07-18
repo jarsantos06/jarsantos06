@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { duracaoCurta, tempoDecorrido } from "@/lib/date";
+import { PageHeader, Card, Badge } from "@/components/ui";
 
 export default async function HistoricoCarretaPage() {
   await requirePermission("carreta.ver");
@@ -14,19 +15,18 @@ export default async function HistoricoCarretaPage() {
     },
   });
 
+  const agora = new Date();
+
   return (
     <div className="mx-auto max-w-5xl">
-      <Link
-        href="/painel/carreta"
-        className="text-sm text-brand-600 hover:underline"
-      >
-        ← Travamento de Carreta
-      </Link>
-      <h1 className="mb-6 mt-2 text-2xl font-semibold text-slate-800">
-        🕑 Histórico de carretas
-      </h1>
+      <PageHeader
+        voltarHref="/painel/carreta"
+        voltarLabel="Travamento de Carreta"
+        titulo="🕑 Histórico de carretas"
+        subtitulo={`${registros.length} registro(s)`}
+      />
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <Card className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500">
             <tr>
@@ -35,6 +35,7 @@ export default async function HistoricoCarretaPage() {
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Travada em / por</th>
               <th className="px-4 py-3 font-medium">Destravada em / por</th>
+              <th className="px-4 py-3 font-medium">Permanência</th>
               <th className="px-4 py-3 font-medium">Foto</th>
             </tr>
           </thead>
@@ -48,15 +49,9 @@ export default async function HistoricoCarretaPage() {
                   {t.ticket}
                 </td>
                 <td className="px-4 py-3">
-                  <span
-                    className={
-                      t.status === "TRAVADA"
-                        ? "rounded bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600"
-                        : "rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700"
-                    }
-                  >
+                  <Badge tone={t.status === "TRAVADA" ? "red" : "green"}>
                     {t.status}
-                  </span>
+                  </Badge>
                 </td>
                 <td className="px-4 py-3 text-xs text-slate-500">
                   {t.travadoEm.toLocaleString("pt-BR")}
@@ -74,6 +69,11 @@ export default async function HistoricoCarretaPage() {
                     "—"
                   )}
                 </td>
+                <td className="px-4 py-3 text-xs text-slate-600">
+                  {t.destravadoEm
+                    ? duracaoCurta(t.travadoEm, t.destravadoEm)
+                    : tempoDecorrido(t.travadoEm, agora)}
+                </td>
                 <td className="px-4 py-3">
                   <a
                     href={t.fotoUrl}
@@ -89,7 +89,7 @@ export default async function HistoricoCarretaPage() {
             {registros.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-4 py-8 text-center text-slate-400"
                 >
                   Nenhum registro de travamento.
@@ -98,7 +98,7 @@ export default async function HistoricoCarretaPage() {
             )}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

@@ -10,12 +10,12 @@ Portal de gestão operacional (logística/pátio) **modular**, com controle de a
 
 ## ✨ Módulos
 
-| Módulo                       | O que faz                                                                            | Opera                                | Audita / Aprova                     |
-| ---------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------ | ----------------------------------- |
-| 📦 **Almoxarifado**          | Entrada/saída de materiais (uso diário e limpeza) com bloqueio de saldo negativo     | Controlador, Encarregado, Supervisor | Cadastro e auditoria: só Supervisor |
-| 🚛 **Travamento de Carreta** | Trava/destrava carretas no pátio com placa, foto, ticket e data/hora automáticos     | Controlador, Encarregado             | —                                   |
-| 📝 **Ocorrências**           | Ficha de falta/atraso com evidência e fluxo de aprovação                             | Todos os funcionários                | Aprovam: Supervisor e Gerente       |
-| 📅 **Escala / Turnos**       | Escalas por padrão (2x2, 6x1, 5x2) e turno, com cálculo automático de trabalha/folga | Funcionário vê a própria             | Monta/edita: Supervisor e Gerente   |
+| Módulo                       | O que faz                                                                                | Opera                                | Audita / Aprova                     |
+| ---------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------- |
+| 📦 **Almoxarifado**          | Entrada/saída de materiais (uso diário e limpeza) com bloqueio de saldo negativo         | Controlador, Encarregado, Supervisor | Cadastro e auditoria: só Supervisor |
+| 🚛 **Travamento de Carreta** | Trava/destrava carretas no pátio com placa, foto e ticket (manual); data/hora automática | Controlador, Encarregado             | —                                   |
+| 📝 **Ocorrências**           | Ficha de falta/atraso com evidência e fluxo de aprovação                                 | Todos os funcionários                | Aprovam: Supervisor e Gerente       |
+| 📅 **Escala / Turnos**       | Escalas por padrão (2x2, 6x1, 5x2) e turno, com cálculo automático de trabalha/folga     | Funcionário vê a própria             | Monta/edita: Supervisor e Gerente   |
 
 ## 🧱 Stack
 

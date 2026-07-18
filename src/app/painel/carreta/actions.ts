@@ -9,40 +9,30 @@ import { salvarUpload } from "@/lib/upload";
 
 export type ActionState = { erro?: string; ok?: string };
 
-// Gera um ticket sequencial legível: TRV-AAAAMMDD-NNNN
-async function gerarTicket(): Promise<string> {
-  const agora = new Date();
-  const inicioDia = new Date(
-    agora.getFullYear(),
-    agora.getMonth(),
-    agora.getDate(),
-  );
-  const y = agora.getFullYear();
-  const m = String(agora.getMonth() + 1).padStart(2, "0");
-  const d = String(agora.getDate()).padStart(2, "0");
-
-  const doDia = await db.travamento.count({
-    where: { travadoEm: { gte: inicioDia } },
-  });
-  const seq = String(doDia + 1).padStart(4, "0");
-  return `TRV-${y}${m}${d}-${seq}`;
-}
-
 function ehColisaoUnica(e: unknown): boolean {
   return (
     e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002"
   );
 }
 
-const placaSchema = z
-  .string()
-  .trim()
-  .toUpperCase()
-  .min(6, "Placa inválida.")
-  .max(8, "Placa inválida.");
+const travarSchema = z.object({
+  placa: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .min(6, "Placa inválida.")
+    .max(8, "Placa inválida."),
+  // Ticket é preenchido manualmente pelo operador (obrigatório e único).
+  ticket: z
+    .string()
+    .trim()
+    .min(1, "Informe o ticket.")
+    .max(40, "Ticket muito longo."),
+});
 
 // ---------------------------------------------------------------------------
 // Travar carreta (Controlador e Encarregado)
+// Ticket é manual; a data/hora é registrada automaticamente (travadoEm).
 // ---------------------------------------------------------------------------
 export async function travarAction(
   _prev: ActionState,
@@ -50,11 +40,14 @@ export async function travarAction(
 ): Promise<ActionState> {
   const sessao = await requirePermission("carreta.operar");
 
-  const placaParse = placaSchema.safeParse(formData.get("placa"));
-  if (!placaParse.success) {
-    return { erro: placaParse.error.issues[0]?.message ?? "Placa inválida." };
+  const parsed = travarSchema.safeParse({
+    placa: formData.get("placa"),
+    ticket: formData.get("ticket"),
+  });
+  if (!parsed.success) {
+    return { erro: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
-  const placa = placaParse.data;
+  const { placa, ticket } = parsed.data;
   const observacao = String(formData.get("observacao") ?? "").trim() || null;
 
   const foto = formData.get("foto");
@@ -64,33 +57,22 @@ export async function travarAction(
   const up = await salvarUpload(foto, "carretas");
   if (up.erro || !up.url) return { erro: up.erro ?? "Falha no upload." };
 
-  // ticket + data/hora são gerados automaticamente pelo sistema.
-  // Sob concorrência, dois tickets podem colidir na sequência do dia; a
-  // restrição @unique protege a integridade e aqui reprocessamos com o
-  // MESMO formato (recalculando a sequência) até um número livre.
-  let ticket = "";
-  let criado = false;
-  for (let tentativa = 0; tentativa < 6 && !criado; tentativa++) {
-    ticket = await gerarTicket();
-    try {
-      await db.travamento.create({
-        data: {
-          placa,
-          ticket,
-          fotoUrl: up.url,
-          observacao,
-          operadorId: sessao.userId,
-          status: "TRAVADA",
-        },
-      });
-      criado = true;
-    } catch (e) {
-      if (ehColisaoUnica(e)) continue; // ticket ocupado: tenta o próximo
-      throw e;
+  try {
+    await db.travamento.create({
+      data: {
+        placa,
+        ticket,
+        fotoUrl: up.url,
+        observacao,
+        operadorId: sessao.userId,
+        status: "TRAVADA",
+      },
+    });
+  } catch (e) {
+    if (ehColisaoUnica(e)) {
+      return { erro: `Já existe um registro com o ticket "${ticket}".` };
     }
-  }
-  if (!criado) {
-    return { erro: "Não foi possível gerar o ticket. Tente novamente." };
+    throw e;
   }
 
   revalidatePath("/painel/carreta");

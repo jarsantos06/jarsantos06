@@ -2,6 +2,7 @@
 
 import { useActionState, useRef } from "react";
 import { travarAction, type ActionState } from "./actions";
+import { Field, Input, Button, Alert } from "@/components/ui";
 
 const inicial: ActionState = {};
 
@@ -18,63 +19,46 @@ export function TravarForm() {
       }}
       className="space-y-4"
     >
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">
-          Placa da carreta
-        </span>
-        <input
-          name="placa"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 uppercase outline-none focus:border-brand-500"
-          placeholder="ABC1D23"
-          maxLength={8}
-        />
-      </label>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Placa">
+          <Input
+            name="placa"
+            className="uppercase"
+            placeholder="ABC1D23"
+            maxLength={8}
+          />
+        </Field>
+        <Field label="Ticket">
+          <Input name="ticket" placeholder="Nº do ticket" maxLength={40} />
+        </Field>
+      </div>
 
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">
-          Foto da carreta travada
-        </span>
-        <input
+      <Field label="Foto da carreta travada">
+        <Input
           name="foto"
           type="file"
           accept="image/*"
           capture="environment"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-600 outline-none file:mr-3 file:rounded file:border-0 file:bg-brand-50 file:px-3 file:py-1 file:text-brand-700"
+          className="file:mr-3 file:rounded file:border-0 file:bg-brand-50 file:px-3 file:py-1 file:text-brand-700"
         />
         <span className="mt-1 block text-xs text-slate-400">
-          Ticket e data/hora são gerados automaticamente.
+          A data e a hora são registradas automaticamente.
         </span>
-      </label>
+      </Field>
 
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">
-          Observação <span className="text-slate-400">(opcional)</span>
-        </span>
-        <input
+      <Field label="Observação" hint="(opcional)">
+        <Input
           name="observacao"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-brand-500"
           placeholder="Ex.: Doca 3, aguardando conferência"
         />
-      </label>
+      </Field>
 
-      {state.erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-          {state.erro}
-        </p>
-      )}
-      {state.ok && (
-        <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
-          {state.ok}
-        </p>
-      )}
+      {state.erro && <Alert tone="danger">{state.erro}</Alert>}
+      {state.ok && <Alert tone="success">{state.ok}</Alert>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-lg bg-brand-600 py-2.5 font-medium text-white hover:bg-brand-700 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Travando..." : "🔒 Travar carreta"}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -29,3 +29,29 @@ export function parseCivilDate(valor: string): Date | null {
 export function formatCivil(d: Date): string {
   return d.toLocaleDateString("pt-BR", { timeZone: "UTC" });
 }
+
+/** Duração curta entre dois instantes: "5 min", "2h 10min", "3 dias". */
+export function duracaoCurta(inicio: Date, fim: Date): string {
+  const min = Math.max(
+    0,
+    Math.floor((fim.getTime() - inicio.getTime()) / 60000),
+  );
+  if (min < 1) return "menos de 1 min";
+  if (min < 60) return `${min} min`;
+  const horas = Math.floor(min / 60);
+  if (horas < 24) {
+    const resto = min % 60;
+    return resto ? `${horas}h ${resto}min` : `${horas}h`;
+  }
+  const dias = Math.floor(horas / 24);
+  return dias === 1 ? "1 dia" : `${dias} dias`;
+}
+
+/**
+ * Tempo decorrido desde um instante (timestamp real, não data civil):
+ * "agora mesmo", "há 5 min", "há 2h 10min", "há 3 dias".
+ */
+export function tempoDecorrido(desde: Date, agora: Date = new Date()): string {
+  if (agora.getTime() - desde.getTime() < 60000) return "agora mesmo";
+  return `há ${duracaoCurta(desde, agora)}`;
+}
