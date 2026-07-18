@@ -1,23 +1,46 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { db } from "./db";
-import { getSession, type SessionPayload } from "./session";
-import { can, type Permission } from "./rbac";
+import { getSession } from "./session";
+import { can, ehPermissaoValida, type Permission } from "./rbac";
+
+/** Usuário autenticado com cargo e permissões atuais (revalidados no banco). */
+export type UsuarioAtual = {
+  userId: string;
+  matricula: string;
+  nome: string;
+  cargoId: string | null;
+  cargoNome: string;
+  permissoes: Permission[];
+};
 
 /**
- * Retorna o usuário atual (revalidado no banco) ou redireciona para o login.
+ * Retorna o usuário atual ou redireciona para o login.
  *
- * Revalidar contra o banco garante que uma conta desativada ou com papel
- * alterado perca acesso imediatamente, em vez de continuar com os dados
- * "congelados" no JWT por até 8h.
+ * Revalida no banco a cada requisição: conta desativada perde acesso na
+ * hora, e mudanças de cargo/permissões (módulo Cadastros) valem
+ * imediatamente. Cargo desativado ou ausente = sem permissões.
  */
-export async function requireUser(): Promise<SessionPayload> {
+export async function requireUser(): Promise<UsuarioAtual> {
   const session = await getSession();
   if (!session) redirect("/login");
 
   const user = await db.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, matricula: true, nome: true, role: true, ativo: true },
+    select: {
+      id: true,
+      matricula: true,
+      nome: true,
+      ativo: true,
+      cargo: {
+        select: {
+          id: true,
+          nome: true,
+          ativo: true,
+          permissoes: { select: { permissao: true } },
+        },
+      },
+    },
   });
 
   if (!user || !user.ativo) {
@@ -27,11 +50,18 @@ export async function requireUser(): Promise<SessionPayload> {
     redirect("/api/auth/logout");
   }
 
+  const permissoes =
+    user.cargo && user.cargo.ativo
+      ? user.cargo.permissoes.map((p) => p.permissao).filter(ehPermissaoValida)
+      : [];
+
   return {
     userId: user.id,
     matricula: user.matricula,
     nome: user.nome,
-    role: user.role, // papel ATUAL do banco (não o do token)
+    cargoId: user.cargo?.id ?? null,
+    cargoNome: user.cargo?.nome ?? "Sem cargo",
+    permissoes,
   };
 }
 
@@ -41,10 +71,10 @@ export async function requireUser(): Promise<SessionPayload> {
  */
 export async function requirePermission(
   permission: Permission,
-): Promise<SessionPayload> {
-  const session = await requireUser();
-  if (!can(session.role, permission)) {
+): Promise<UsuarioAtual> {
+  const user = await requireUser();
+  if (!can(user.permissoes, permission)) {
     redirect("/painel?erro=sem-permissao");
   }
-  return session;
+  return user;
 }

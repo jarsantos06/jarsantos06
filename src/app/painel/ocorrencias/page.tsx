@@ -21,7 +21,7 @@ export default async function OcorrenciasPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   const sessao = await requirePermission("ocorrencia.criar");
-  const podeAprovar = can(sessao.role, "ocorrencia.aprovar");
+  const podeAprovar = can(sessao.permissoes, "ocorrencia.aprovar");
   const { status } = await searchParams;
   const filtro = FILTROS.find((f) => f.chave === status)?.chave;
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
-import { roleLabel } from "@/lib/rbac";
+
 import { db } from "@/lib/db";
 import { atribuicaoDoDia, type AtribuicaoEscala } from "@/lib/escala";
 import { PageHeader, Card, btn } from "@/components/ui";
@@ -12,6 +12,7 @@ export default async function GerenciarEscalaPage() {
     db.user.findMany({
       where: { ativo: true },
       orderBy: { nome: "asc" },
+      include: { cargo: { select: { nome: true } } },
     }),
     db.escalaFuncionario.findMany({
       include: { padrao: true, turno: true },
@@ -108,7 +109,7 @@ export default async function GerenciarEscalaPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-slate-600">
-                    {roleLabel(u.role)}
+                    {u.cargo?.nome ?? "Sem cargo"}
                   </td>
                   <td className="px-4 py-3">
                     {atual ? (

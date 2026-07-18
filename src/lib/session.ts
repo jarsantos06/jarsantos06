@@ -1,16 +1,17 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import type { Role } from "@prisma/client";
 import { sessionSecret as secret } from "./secret";
 
 const COOKIE_NAME = "sessao";
 
+// O token guarda apenas a identidade. Cargo e permissões são SEMPRE
+// carregados do banco em requireUser — assim, mudanças de cargo/permissão
+// feitas no módulo Cadastros valem imediatamente, sem reemitir o token.
 export type SessionPayload = {
   userId: string;
   matricula: string;
   nome: string;
-  role: Role;
 };
 
 export async function createSession(payload: SessionPayload): Promise<void> {
@@ -41,7 +42,6 @@ export async function getSession(): Promise<SessionPayload | null> {
       userId: payload.userId as string,
       matricula: payload.matricula as string,
       nome: payload.nome as string,
-      role: payload.role as Role,
     };
   } catch {
     return null;

@@ -12,8 +12,8 @@ export default async function MaterialPage({
   params: Promise<{ id: string }>;
 }) {
   const sessao = await requirePermission("almoxarifado.ver");
-  const podeMovimentar = can(sessao.role, "almoxarifado.movimentar");
-  const podeGerenciar = can(sessao.role, "almoxarifado.gerenciar");
+  const podeMovimentar = can(sessao.permissoes, "almoxarifado.movimentar");
+  const podeGerenciar = can(sessao.permissoes, "almoxarifado.gerenciar");
   const { id } = await params;
 
   const material = await db.material.findUnique({

@@ -1,5 +1,5 @@
 import { requirePermission } from "@/lib/auth";
-import { roleLabel } from "@/lib/rbac";
+
 import { db } from "@/lib/db";
 import { PageHeader, Card } from "@/components/ui";
 import { NovaEscalaForm } from "./NovaEscalaForm";
@@ -13,7 +13,11 @@ export default async function NovaEscalaPage({
   const { funcionarioId } = await searchParams;
 
   const [usuarios, padroes, turnos] = await Promise.all([
-    db.user.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    db.user.findMany({
+      where: { ativo: true },
+      orderBy: { nome: "asc" },
+      include: { cargo: { select: { nome: true } } },
+    }),
     db.padraoEscala.findMany({
       where: { ativo: true },
       orderBy: { nome: "asc" },
@@ -33,7 +37,7 @@ export default async function NovaEscalaPage({
           funcionarioIdInicial={funcionarioId}
           funcionarios={usuarios.map((u) => ({
             id: u.id,
-            label: `${u.nome} (${roleLabel(u.role)})`,
+            label: `${u.nome} (${u.cargo?.nome ?? "Sem cargo"})`,
           }))}
           padroes={padroes.map((p) => ({
             id: p.id,

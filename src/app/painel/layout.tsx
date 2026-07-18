@@ -1,5 +1,5 @@
 import { requireUser } from "@/lib/auth";
-import { can, roleLabel } from "@/lib/rbac";
+import { can } from "@/lib/rbac";
 import { MODULOS } from "@/lib/navigation";
 import { Logo } from "@/components/ui";
 import { NavLinks, type NavItem } from "./_components/NavLinks";
@@ -11,7 +11,9 @@ export default async function PainelLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
-  const modulosVisiveis = MODULOS.filter((m) => can(user.role, m.permissao));
+  const modulosVisiveis = MODULOS.filter((m) =>
+    can(user.permissoes, m.permissao),
+  );
 
   const itens: NavItem[] = [
     { href: "/painel", label: "Início", emoji: "🏠" },
@@ -22,7 +24,7 @@ export default async function PainelLayout({
     })),
   ];
 
-  const papel = roleLabel(user.role);
+  const papel = user.cargoNome;
 
   return (
     <div className="flex min-h-screen">

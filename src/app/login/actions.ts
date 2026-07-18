@@ -39,7 +39,6 @@ export async function loginAction(
     userId: user.id,
     matricula: user.matricula,
     nome: user.nome,
-    role: user.role,
   });
 
   redirect("/painel");

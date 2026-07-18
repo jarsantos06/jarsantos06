@@ -16,6 +16,7 @@ Portal de gestão operacional (logística/pátio) **modular**, com controle de a
 | 🚛 **Travamento de Carreta** | Trava/destrava carretas no pátio com placa, foto e ticket (manual); data/hora automática | Controlador, Encarregado             | —                                   |
 | 📝 **Ocorrências**           | Ficha de falta/atraso com evidência e fluxo de aprovação                                 | Todos os funcionários                | Aprovam: Supervisor e Gerente       |
 | 📅 **Escala / Turnos**       | Escalas por padrão (2x2, 6x1, 5x2) e turno, com cálculo automático de trabalha/folga     | Funcionário vê a própria             | Monta/edita: Supervisor e Gerente   |
+| 🗂️ **Cadastros**             | Funcionários, cargos e permissões — as regras de cada cargo são marcadas na tela         | Supervisor consulta                  | Gerencia: Gerente                   |
 
 ## 🧱 Stack
 
@@ -25,9 +26,13 @@ Portal de gestão operacional (logística/pátio) **modular**, com controle de a
 - Autenticação por sessão (JWT em cookie `httpOnly`) + middleware
 - RBAC centralizado (`src/lib/rbac.ts`)
 
-## 👥 Papéis de acesso
+## 👥 Cargos e permissões (RBAC dinâmico)
 
-`Funcionário` · `Controlador` · `Encarregado` · `Supervisor` · `Gerente`
+Os cargos são **dados, não código**: o Gerente cria cargos no módulo Cadastros
+(ex.: `Assistente de Logística N1–N3`, `Controlador`, `Encarregado N1–N3`,
+`Supervisor`, `Gerente`) e marca na tela quais regras de negócio cada cargo
+pode usar. As mudanças valem **imediatamente**, sem novo login. O catálogo de
+permissões existentes vive em `src/lib/rbac.ts`; a atribuição vive no banco.
 
 ## 🚀 Começando
 

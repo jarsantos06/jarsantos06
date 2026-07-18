@@ -20,7 +20,7 @@ export default async function CarretaPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const sessao = await requirePermission("carreta.ver");
-  const podeOperar = can(sessao.role, "carreta.operar");
+  const podeOperar = can(sessao.permissoes, "carreta.operar");
   const { q } = await searchParams;
   const busca = (q ?? "").trim().toUpperCase();
 

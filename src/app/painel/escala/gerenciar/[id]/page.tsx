@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requirePermission } from "@/lib/auth";
-import { roleLabel } from "@/lib/rbac";
+
 import { db } from "@/lib/db";
 import { montarMes } from "@/lib/escala";
 import { formatCivil } from "@/lib/date";
@@ -21,7 +21,10 @@ export default async function FuncionarioEscalaPage({
   const { id } = await params;
   const { ano, mes } = resolverMes(await searchParams);
 
-  const funcionario = await db.user.findUnique({ where: { id } });
+  const funcionario = await db.user.findUnique({
+    where: { id },
+    include: { cargo: { select: { nome: true } } },
+  });
   if (!funcionario) notFound();
 
   const [atribuicoes, registros] = await Promise.all([
@@ -46,7 +49,7 @@ export default async function FuncionarioEscalaPage({
         voltarHref="/painel/escala/gerenciar"
         voltarLabel="Equipe"
         titulo={funcionario.nome}
-        subtitulo={`${roleLabel(funcionario.role)} · ${funcionario.matricula}`}
+        subtitulo={`${funcionario.cargo?.nome ?? "Sem cargo"} · ${funcionario.matricula}`}
         acoes={
           <Link
             href={`/painel/escala/nova?funcionarioId=${id}`}

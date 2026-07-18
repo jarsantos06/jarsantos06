@@ -12,15 +12,31 @@ datasource db {
 }
 
 // ---------------------------------------------------------------------------
-// Papéis de acesso (RBAC)
-// FUNCIONARIO < CONTROLADOR < ENCARREGADO < SUPERVISOR < GERENTE
+// MÓDULO CADASTROS — cargos e permissões dinâmicas (RBAC dirigido pelo banco)
+//
+// O CÓDIGO define o catálogo de permissões existentes (src/lib/rbac.ts);
+// o BANCO define quais cargos possuem cada permissão — editável na UI.
 // ---------------------------------------------------------------------------
-enum Role {
-  FUNCIONARIO
-  CONTROLADOR
-  ENCARREGADO
-  SUPERVISOR
-  GERENTE
+model Cargo {
+  id        String   @id @default(cuid())
+  nome      String   @unique // "Controlador", "Assistente de Logística N1"...
+  nivel     Int      @default(0) // ordem de exibição (1 = mais operacional)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  permissoes CargoPermissao[]
+  usuarios   User[]
+}
+
+model CargoPermissao {
+  id        String @id @default(cuid())
+  cargo     Cargo  @relation(fields: [cargoId], references: [id], onDelete: Cascade)
+  cargoId   String
+  permissao String // chave do catálogo em src/lib/rbac.ts (ex.: "almoxarifado.ver")
+
+  @@unique([cargoId, permissao])
+  @@index([cargoId])
 }
 
 model User {
@@ -29,7 +45,8 @@ model User {
   nome      String
   email     String?  @unique
   senhaHash String
-  role      Role     @default(FUNCIONARIO)
+  cargo     Cargo?   @relation(fields: [cargoId], references: [id])
+  cargoId   String? // nulo = sem cargo definido (sem acesso aos módulos)
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -43,7 +60,7 @@ model User {
   escalas       EscalaFuncionario[]    @relation("EscalaFuncionario")
   escalasCriadas EscalaFuncionario[]   @relation("EscalaCriador")
 
-  @@index([role])
+  @@index([cargoId])
 }
 
 // ===========================================================================

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { can, roleLabel } from "@/lib/rbac";
+import { can } from "@/lib/rbac";
 import { db } from "@/lib/db";
 import { MODULOS } from "@/lib/navigation";
 import { atribuicaoDoDia, trabalhaNoDia } from "@/lib/escala";
@@ -14,12 +14,12 @@ export default async function PainelHome({
 }) {
   const user = await requireUser();
   const { erro } = await searchParams;
-  const modulos = MODULOS.filter((m) => can(user.role, m.permissao));
+  const modulos = MODULOS.filter((m) => can(user.permissoes, m.permissao));
 
-  const podeAlmox = can(user.role, "almoxarifado.ver");
-  const podeCarreta = can(user.role, "carreta.ver");
-  const podeAprovar = can(user.role, "ocorrencia.aprovar");
-  const podeEscala = can(user.role, "escala.ver");
+  const podeAlmox = can(user.permissoes, "almoxarifado.ver");
+  const podeCarreta = can(user.permissoes, "carreta.ver");
+  const podeAprovar = can(user.permissoes, "ocorrencia.aprovar");
+  const podeEscala = can(user.permissoes, "escala.ver");
 
   const agora = new Date();
   const hojeUTC = new Date(
@@ -84,7 +84,7 @@ export default async function PainelHome({
           Olá, {user.nome.split(" ")[0]} 👋
         </h1>
         <p className="text-slate-500">
-          Perfil de acesso: <strong>{roleLabel(user.role)}</strong>
+          Perfil de acesso: <strong>{user.cargoNome}</strong>
         </p>
       </div>
 

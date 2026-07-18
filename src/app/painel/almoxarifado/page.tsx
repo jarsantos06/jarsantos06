@@ -23,8 +23,8 @@ export default async function AlmoxarifadoPage({
   searchParams: Promise<{ q?: string; cat?: string }>;
 }) {
   const sessao = await requirePermission("almoxarifado.ver");
-  const podeGerenciar = can(sessao.role, "almoxarifado.gerenciar");
-  const podeAuditar = can(sessao.role, "almoxarifado.auditar");
+  const podeGerenciar = can(sessao.permissoes, "almoxarifado.gerenciar");
+  const podeAuditar = can(sessao.permissoes, "almoxarifado.auditar");
 
   const { q, cat } = await searchParams;
   const busca = (q ?? "").trim();

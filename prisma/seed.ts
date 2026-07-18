@@ -1,24 +1,54 @@
-import { PrismaClient, type Role } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { CARGOS_PADRAO } from "../src/lib/rbac";
 
 const db = new PrismaClient();
 
 async function main() {
   const senhaHash = await bcrypt.hash("123456", 10);
 
-  const usuarios: { matricula: string; nome: string; role: Role }[] = [
-    { matricula: "1001", nome: "Ana Funcionária", role: "FUNCIONARIO" },
-    { matricula: "2001", nome: "Carlos Controlador", role: "CONTROLADOR" },
-    { matricula: "3001", nome: "Eduardo Encarregado", role: "ENCARREGADO" },
-    { matricula: "4001", nome: "Sônia Supervisora", role: "SUPERVISOR" },
-    { matricula: "5001", nome: "Gustavo Gerente", role: "GERENTE" },
+  // -------------------------------------------------------------------------
+  // Cargos e permissões padrão (depois tudo é editável no módulo Cadastros).
+  // As permissões do cargo são REPOSTAS a cada seed para refletir o padrão;
+  // ajustes feitos na UI sobrevivem enquanto você não rodar o seed de novo.
+  // -------------------------------------------------------------------------
+  for (const c of CARGOS_PADRAO) {
+    const cargo = await db.cargo.upsert({
+      where: { nome: c.nome },
+      update: { nivel: c.nivel, ativo: true },
+      create: { nome: c.nome, nivel: c.nivel },
+    });
+    await db.cargoPermissao.deleteMany({ where: { cargoId: cargo.id } });
+    await db.cargoPermissao.createMany({
+      data: c.permissoes.map((p) => ({ cargoId: cargo.id, permissao: p })),
+    });
+  }
+
+  const cargoPorNome = async (nome: string) => {
+    const c = await db.cargo.findUnique({ where: { nome } });
+    if (!c) throw new Error(`Cargo não encontrado no seed: ${nome}`);
+    return c.id;
+  };
+
+  // Usuários de exemplo — um por faixa de cargo
+  const usuarios: { matricula: string; nome: string; cargo: string }[] = [
+    {
+      matricula: "1001",
+      nome: "Ana Assistente",
+      cargo: "Assistente de Logística N1",
+    },
+    { matricula: "2001", nome: "Carlos Controlador", cargo: "Controlador" },
+    { matricula: "3001", nome: "Eduardo Encarregado", cargo: "Encarregado N1" },
+    { matricula: "4001", nome: "Sônia Supervisora", cargo: "Supervisor" },
+    { matricula: "5001", nome: "Gustavo Gerente", cargo: "Gerente" },
   ];
 
   for (const u of usuarios) {
+    const cargoId = await cargoPorNome(u.cargo);
     await db.user.upsert({
       where: { matricula: u.matricula },
-      update: { nome: u.nome, role: u.role, ativo: true },
-      create: { ...u, senhaHash },
+      update: { nome: u.nome, cargoId, ativo: true },
+      create: { matricula: u.matricula, nome: u.nome, cargoId, senhaHash },
     });
   }
 
@@ -85,7 +115,7 @@ async function main() {
     });
   }
 
-  // Escala de exemplo para a funcionária Ana (2x2 diurno, a partir de 01/07/2026)
+  // Escala de exemplo para a Ana (2x2 diurno, a partir de 01/07/2026)
   const ana = await db.user.findUnique({ where: { matricula: "1001" } });
   const gerente = await db.user.findUnique({ where: { matricula: "5001" } });
   const padrao2x2 = await db.padraoEscala.findUnique({
@@ -111,9 +141,10 @@ async function main() {
   }
 
   console.log("✅ Seed concluído.");
+  console.log(`   Cargos: ${CARGOS_PADRAO.map((c) => c.nome).join(", ")}`);
   console.log("   Usuários (senha para todos: 123456):");
   usuarios.forEach((u) =>
-    console.log(`   - ${u.matricula} → ${u.nome} (${u.role})`),
+    console.log(`   - ${u.matricula} → ${u.nome} (${u.cargo})`),
   );
 }
 

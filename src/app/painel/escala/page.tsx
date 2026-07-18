@@ -12,7 +12,7 @@ export default async function EscalaPage({
   searchParams: Promise<{ ano?: string; mes?: string }>;
 }) {
   const sessao = await requirePermission("escala.ver");
-  const podeGerenciar = can(sessao.role, "escala.gerenciar");
+  const podeGerenciar = can(sessao.permissoes, "escala.gerenciar");
   const { ano, mes } = resolverMes(await searchParams);
 
   const atribuicoes = await carregarAtribuicoes(sessao.userId);

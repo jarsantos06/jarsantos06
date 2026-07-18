@@ -44,4 +44,12 @@ export const MODULOS: ModuloNav[] = [
     emoji: "📅",
     permissao: "escala.ver",
   },
+  {
+    chave: "cadastros",
+    titulo: "Cadastros",
+    descricao: "Funcionários, cargos e permissões de acesso",
+    href: "/painel/cadastros",
+    emoji: "🗂️",
+    permissao: "cadastros.ver",
+  },
 ];
